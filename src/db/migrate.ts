@@ -21,13 +21,23 @@ async function migrate() {
     if (rows.length > 0) continue
 
     const sql = await readFile(join(migrationsDir, file), 'utf8')
-    await db.query(sql)
-    await db.query('INSERT INTO _migrations (filename) VALUES ($1)', [file])
-    console.log(`✓ ${file}`)
+    const client = await db.connect()
+    try {
+      await client.query('BEGIN')
+      await client.query(sql)
+      await client.query('INSERT INTO _migrations (filename) VALUES ($1)', [file])
+      await client.query('COMMIT')
+      console.log(`✓ ${file}`)
+    } catch (err) {
+      await client.query('ROLLBACK')
+      throw new Error(`Migration failed: ${file}\n${(err as Error).message}`)
+    } finally {
+      client.release()
+    }
   }
 
   await db.end()
   console.log('Migrations complete.')
 }
 
-migrate().catch(err => { console.error(err); process.exit(1) })
+migrate().catch(err => { console.error(err.message); process.exit(1) })

@@ -11,3 +11,5 @@ CREATE TABLE payments (
   paid_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX payments_senang_txn_idx ON payments(senang_transaction_id) WHERE senang_transaction_id IS NOT NULL;
