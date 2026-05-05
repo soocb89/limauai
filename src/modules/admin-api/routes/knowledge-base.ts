@@ -44,7 +44,8 @@ kbRouter.post('/upload', upload.single('file'), async (req, res) => {
 
   let text = ''
   if (req.file.mimetype === 'application/pdf') {
-    const pdfParse = (await import('pdf-parse')).default
+    const pdfParseModule = await import('pdf-parse')
+    const pdfParse = (pdfParseModule as any).default ?? pdfParseModule
     const data = await pdfParse(req.file.buffer)
     text = data.text
   } else if (req.file.mimetype.includes('word') || req.file.originalname.endsWith('.docx')) {
