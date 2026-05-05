@@ -2,7 +2,7 @@ import 'dotenv/config'
 
 function required(key: string): string {
   const val = process.env[key]
-  if (!val) throw new Error(`Missing required env var: ${key}`)
+  if (val === undefined || val === '') throw new Error(`Missing required env var: ${key}`)
   return val
 }
 
@@ -13,5 +13,5 @@ export const config = {
   admin: { apiKey: required('ADMIN_API_KEY') },
   owner: { phone: required('OWNER_PHONE') },
   baileys: { sessionPath: process.env.BAILEYS_SESSION_PATH ?? './baileys-session' },
-  port: parseInt(process.env.PORT ?? '3000', 10),
+  port: (() => { const p = parseInt(process.env.PORT ?? '3000', 10); return Number.isFinite(p) ? p : 3000 })(),
 } as const
