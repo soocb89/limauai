@@ -1,0 +1,4 @@
+CREATE TABLE bot_config (
+  key VARCHAR(100) PRIMARY KEY,
+  value TEXT NOT NULL
+);
