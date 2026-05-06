@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(New-Item *)"
+      "PowerShell(New-Item *)",
+      "PowerShell(head *)",
+      "PowerShell(Set-ExecutionPolicy *)",
+      "PowerShell(winget install *)"
     ]
   }
 }

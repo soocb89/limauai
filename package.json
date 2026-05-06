@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsc",
+    "build": "tsc && xcopy /E /I /Y src\\db\\migrations dist\\db\\migrations > nul",
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -24,7 +24,7 @@
   "type": "module",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^6.7.21",
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "bullmq": "^5.76.5",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -44,6 +44,7 @@
     "@types/node": "^25.6.0",
     "@types/pdf-parse": "^1.1.5",
     "@types/pg": "^8.20.0",
+    "@types/qrcode-terminal": "^0.12.2",
     "@types/supertest": "^7.2.0",
     "supertest": "^7.2.2",
     "tsx": "^4.21.0",

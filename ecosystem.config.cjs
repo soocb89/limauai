@@ -22,5 +22,20 @@ module.exports = {
         PORT: process.env.PORT,
       },
     },
+    {
+      name: 'limauai-admin',
+      script: 'node_modules/next/dist/bin/next',
+      args: 'start -p 3000',
+      cwd: path.join(__dirname, 'admin'),
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '512M',
+      env: {
+        NODE_ENV: 'production',
+        NEXT_PUBLIC_API_URL: 'http://localhost:3001',
+        NEXT_PUBLIC_API_KEY: process.env.ADMIN_API_KEY,
+      },
+    },
   ],
 }

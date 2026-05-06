@@ -1,37 +1,55 @@
 import makeWASocket, {
   DisconnectReason,
+  fetchLatestBaileysVersion,
+  makeCacheableSignalKeyStore,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys'
 import { Boom } from '@hapi/boom'
 import { EventEmitter } from 'events'
+import qrcode from 'qrcode-terminal'
 import { config } from '../../config.js'
 import { setSock } from './sender.js'
 
 export const waEvents = new EventEmitter()
 
 let reconnectAttempts = 0
-const MAX_RECONNECT = 3
+const MAX_RECONNECT = 5
 
 export async function startWAConnector(): Promise<void> {
   const { state, saveCreds } = await useMultiFileAuthState(config.baileys.sessionPath)
+  const { version } = await fetchLatestBaileysVersion()
+  console.log(`WA: using version ${version.join('.')}`)
 
   const sock = makeWASocket({
-    auth: state,
-    printQRInTerminal: true,
+    version,
+    auth: {
+      creds: state.creds,
+      keys: makeCacheableSignalKeyStore(state.keys, undefined as any),
+    },
+    browser: ['LimauAI', 'Chrome', '120.0.0'],
+    connectTimeoutMs: 60_000,
+    keepAliveIntervalMs: 10_000,
   })
 
   setSock(sock)
   sock.ev.on('creds.update', saveCreds)
 
   sock.ev.on('connection.update', async (update) => {
-    const { connection, lastDisconnect } = update
+    const { connection, lastDisconnect, qr } = update
+
+    if (qr) {
+      console.log('\n=== SCAN THIS QR WITH WHATSAPP ===')
+      qrcode.generate(qr, { small: true })
+      console.log('==================================\n')
+    }
 
     if (connection === 'close') {
       const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode
       const loggedOut = statusCode === DisconnectReason.loggedOut
 
       if (loggedOut) {
-        console.error('WA: Logged out. Delete session and restart.')
+        console.error('WA: Logged out. Delete session folder and restart.')
+        waEvents.emit('fatal-disconnect')
         return
       }
 
@@ -42,7 +60,7 @@ export async function startWAConnector(): Promise<void> {
         return
       }
 
-      const delay = Math.pow(2, reconnectAttempts) * 1000
+      const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, 30_000)
       console.log(`WA: Reconnecting in ${delay}ms (attempt ${reconnectAttempts})`)
       setTimeout(() => startWAConnector(), delay)
       return
@@ -50,7 +68,7 @@ export async function startWAConnector(): Promise<void> {
 
     if (connection === 'open') {
       reconnectAttempts = 0
-      console.log('WA: Connected')
+      console.log('WA: Connected ✓')
       waEvents.emit('ready')
     }
   })
