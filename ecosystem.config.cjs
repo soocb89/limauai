@@ -37,5 +37,13 @@ module.exports = {
         NEXT_PUBLIC_API_KEY: process.env.ADMIN_API_KEY,
       },
     },
+    {
+      name: 'cloudflared',
+      script: 'C:\\Program Files (x86)\\cloudflared\\cloudflared.exe',
+      args: 'tunnel run limauai',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+    },
   ],
 }
