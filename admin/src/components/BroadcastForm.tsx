@@ -17,7 +17,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export function BroadcastForm() {
-  const [promotionId, setPromotionId] = useState<number | null>(null)
+  const [promotionId, setPromotionId] = useState<string | null>(null)
   const { data: promotions = [] } = usePromotions()
   const { data: stats } = useBroadcastStats(promotionId)
   const sendMutation = useSendBroadcast()
@@ -38,7 +38,7 @@ export function BroadcastForm() {
     <div className="space-y-4 max-w-lg">
       <div>
         <Label>Promotion</Label>
-        <Select onValueChange={(v) => setPromotionId(Number(v))}>
+        <Select onValueChange={(v: string | null) => setPromotionId(v)}>
           <SelectTrigger>
             <SelectValue placeholder="Select promotion…" />
           </SelectTrigger>

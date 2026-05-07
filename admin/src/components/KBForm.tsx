@@ -25,7 +25,7 @@ interface Props {
 
 export function KBForm({ entry, onDone }: Props) {
   const addMutation = useAddKB()
-  const updateMutation = useUpdateKB(entry?.id ?? 0)
+  const updateMutation = useUpdateKB(entry?.id ?? '')
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { title: '', content: '', category: '' },

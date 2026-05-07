@@ -34,9 +34,9 @@ npm run build
 Set-Location $root
 
 Write-Host "==> Starting all processes with PM2..." -ForegroundColor Cyan
-pm2 delete limauai 2>$null; $true
-pm2 delete limauai-admin 2>$null; $true
-pm2 delete cloudflared 2>$null; $true
+try { pm2 delete limauai } catch { }
+try { pm2 delete limauai-admin } catch { }
+try { pm2 delete cloudflared } catch { }
 pm2 start ecosystem.config.cjs
 pm2 save
 

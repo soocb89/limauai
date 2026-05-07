@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 export default function CustomersPage() {
   const [search, setSearch] = useState('')
   const [language, setLanguage] = useState('')
-  const { data: customers = [], isLoading } = useCustomers({ search: search || undefined, language: language || undefined })
+  const { data: result, isLoading } = useCustomers({ search: search || undefined, language: language || undefined })
+  const customers = result?.data ?? []
 
   return (
     <div className="space-y-4">

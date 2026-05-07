@@ -49,7 +49,7 @@ function PromotionTable({
   onDelete,
 }: {
   promotions: ReturnType<typeof usePromotions>['data'] & {}
-  onDelete: (id: number) => Promise<void>
+  onDelete: (id: string) => Promise<void>
 }) {
   if (promotions.length === 0) {
     return <p className="text-muted-foreground text-sm">No promotions.</p>
@@ -78,7 +78,7 @@ function PromotionRow({
   onDelete,
 }: {
   promotion: NonNullable<ReturnType<typeof usePromotions>['data']>[number]
-  onDelete: (id: number) => Promise<void>
+  onDelete: (id: string) => Promise<void>
 }) {
   const tagMutation = useTagCustomers(p.id)
 
