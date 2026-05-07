@@ -33,8 +33,8 @@ module.exports = {
       max_memory_restart: '512M',
       env: {
         NODE_ENV: 'production',
-        NEXT_PUBLIC_API_URL: 'http://localhost:3001',
-        NEXT_PUBLIC_API_KEY: process.env.ADMIN_API_KEY,
+        BACKEND_URL: 'http://localhost:3001',
+        ADMIN_API_KEY: process.env.ADMIN_API_KEY,
       },
     },
     {

@@ -12,6 +12,8 @@ import { setSock } from './sender.js'
 
 export const waEvents = new EventEmitter()
 
+// Module-level var intentionally — recursive startWAConnector() calls share this binding,
+// so the reset on connection === 'open' correctly clears the count across all call frames.
 let reconnectAttempts = 0
 const MAX_RECONNECT = 5
 

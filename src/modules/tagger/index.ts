@@ -20,13 +20,11 @@ export async function tagConversation(
   const intentTag = INTENT_TAGS[intent as Intent]
   if (intentTag) tags.push(intentTag)
 
-  for (const tag of tags) {
-    await db.query(
-      `UPDATE conversations
-       SET tags = array_append(COALESCE(tags, '{}'), $2),
-       updated_at = NOW()
-       WHERE id = $1 AND NOT ($2 = ANY(COALESCE(tags, '{}')))`,
-      [conversationId, tag]
-    )
-  }
+  await db.query(
+    `UPDATE conversations
+     SET tags = ARRAY(SELECT DISTINCT unnest(COALESCE(tags, '{}') || $2::text[])),
+         updated_at = NOW()
+     WHERE id = $1`,
+    [conversationId, tags]
+  )
 }

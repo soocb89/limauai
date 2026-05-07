@@ -77,6 +77,12 @@ customersRouter.put('/:id', async (req, res) => {
   res.json(rows[0])
 })
 
+customersRouter.delete('/:id', async (req, res) => {
+  const { rowCount } = await db.query('DELETE FROM customers WHERE id = $1', [req.params.id])
+  if (!rowCount) return res.status(404).json({ error: 'Not found' })
+  res.json({ deleted: true })
+})
+
 customersRouter.post('/import', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
 

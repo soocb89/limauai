@@ -84,7 +84,7 @@ kbRouter.get('/gaps', async (_req, res) => {
 })
 
 function chunkText(text: string, maxWords: number): string[] {
-  const sentences = text.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/)
+  const sentences = text.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/).filter(Boolean)
   const chunks: string[] = []
   let current = ''
   for (const sentence of sentences) {
