@@ -88,7 +88,8 @@ export async function startWAConnector(): Promise<void> {
         ''
       if (!text) continue
       const phone = jid.replace('@s.whatsapp.net', '')
-      waEvents.emit('message', { phone, text, raw: msg })
+      const pushName = msg.pushName ?? null
+      waEvents.emit('message', { phone, text, pushName, raw: msg })
     }
   })
 }

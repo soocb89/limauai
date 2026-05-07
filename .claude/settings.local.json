@@ -4,7 +4,14 @@
       "PowerShell(New-Item *)",
       "PowerShell(head *)",
       "PowerShell(Set-ExecutionPolicy *)",
-      "PowerShell(winget install *)"
+      "PowerShell(winget install *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(cloudflared tunnel *)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(cloudflared *)",
+      "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\cloudflared\\\\cloudflared.exe\" tunnel create limauai 2>&1)",
+      "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\cloudflared\\\\cloudflared.exe\" tunnel route dns limauai admin.limauais.my 2>&1)"
     ]
   }
 }

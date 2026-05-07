@@ -11,9 +11,9 @@ app.use(express.json())
 app.use('/admin', adminRouter)
 app.use('/webhook', webhookRouter_)
 
-waEvents.on('message', async ({ phone, text }: { phone: string; text: string }) => {
+waEvents.on('message', async ({ phone, text, pushName }: { phone: string; text: string; pushName?: string | null }) => {
   try {
-    await handleIncomingMessage(phone, text)
+    await handleIncomingMessage(phone, text, pushName)
   } catch (err) {
     console.error('Pipeline error:', err)
   }

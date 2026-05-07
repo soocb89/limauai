@@ -66,12 +66,22 @@ async function handleConsentReply(
   return false
 }
 
-export async function handleIncomingMessage(phone: string, text: string): Promise<void> {
+export async function handleIncomingMessage(phone: string, text: string, pushName?: string | null): Promise<void> {
   const customer = await getOrCreateCustomer(phone)
   const language = detectLanguage(text)
 
+  const updates: string[] = []
+  const params: unknown[] = []
+
   if (!customer.language || customer.language !== language) {
-    await db.query('UPDATE customers SET language = $1 WHERE id = $2', [language, customer.id])
+    params.push(language); updates.push(`language = $${params.length}`)
+  }
+  if (pushName && !customer.name) {
+    params.push(pushName); updates.push(`name = $${params.length}`)
+  }
+  if (updates.length) {
+    params.push(customer.id)
+    await db.query(`UPDATE customers SET ${updates.join(', ')} WHERE id = $${params.length}`, params)
   }
 
   const context = await loadContext(customer.id)

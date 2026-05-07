@@ -31,7 +31,7 @@ customersRouter.get('/', async (req, res) => {
 
   const countSql = `SELECT COUNT(*)::int AS total FROM customers ${where}`
   const dataSql = `SELECT id, phone, name, email, language, renewal_date, car_plate, insurer,
-                          consent, source, created_at
+                          consent, source, tags, custom_fields, created_at
                    FROM customers ${where}
                    ORDER BY created_at DESC
                    LIMIT ${limit} OFFSET ${offset}`
@@ -64,14 +64,36 @@ customersRouter.post('/', async (req, res) => {
 })
 
 customersRouter.put('/:id', async (req, res) => {
-  const { name, email, language, renewal_date, car_plate, insurer, senang_customer_id, consent } = req.body
+  const { name, email, language, renewal_date, car_plate, insurer, senang_customer_id, consent, tags, custom_fields } = req.body
   const { rows } = await db.query(
     `UPDATE customers SET name=$1, email=$2, language=$3, renewal_date=$4,
      car_plate=$5, insurer=$6, senang_customer_id=$7, consent=$8,
      consent_given_at = CASE WHEN $8 = true AND consent = false THEN NOW() ELSE consent_given_at END,
+     tags=COALESCE($9, tags), custom_fields=COALESCE($10, custom_fields),
      updated_at=NOW()
-     WHERE id=$9 RETURNING *`,
-    [name, email, language, renewal_date, car_plate, insurer, senang_customer_id, consent, req.params.id]
+     WHERE id=$11 RETURNING *`,
+    [name, email, language, renewal_date, car_plate, insurer, senang_customer_id, consent,
+     tags ?? null, custom_fields ? JSON.stringify(custom_fields) : null, req.params.id]
+  )
+  if (!rows[0]) return res.status(404).json({ error: 'Not found' })
+  res.json(rows[0])
+})
+
+customersRouter.patch('/:id', async (req, res) => {
+  const allowed = ['name', 'email', 'language', 'renewal_date', 'car_plate', 'insurer', 'consent', 'tags', 'custom_fields']
+  const updates: string[] = []
+  const params: unknown[] = []
+  for (const key of allowed) {
+    if (key in req.body) {
+      params.push(key === 'custom_fields' ? JSON.stringify(req.body[key]) : req.body[key])
+      updates.push(`${key} = $${params.length}`)
+    }
+  }
+  if (!updates.length) return res.status(400).json({ error: 'No valid fields' })
+  params.push(req.params.id)
+  const { rows } = await db.query(
+    `UPDATE customers SET ${updates.join(', ')}, updated_at=NOW() WHERE id=$${params.length} RETURNING *`,
+    params
   )
   if (!rows[0]) return res.status(404).json({ error: 'Not found' })
   res.json(rows[0])

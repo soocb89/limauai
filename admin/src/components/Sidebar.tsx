@@ -11,6 +11,7 @@ import {
   Settings,
   Clock,
   Zap,
+  Webhook,
 } from 'lucide-react'
 
 const NAV = [
@@ -20,6 +21,7 @@ const NAV = [
   { href: '/promotions', label: 'Promotions', icon: Megaphone },
   { href: '/broadcast', label: 'Broadcast', icon: Zap },
   { href: '/scheduler', label: 'Scheduler', icon: Clock },
+  { href: '/webhooks', label: 'Webhooks', icon: Webhook },
   { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
