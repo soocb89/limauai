@@ -9,6 +9,7 @@ import { schedulerRouter } from './routes/scheduler.js'
 import { botConfigRouter } from './routes/bot-config.js'
 import { correctionsRouter } from './routes/corrections.js'
 import { webhookRouter } from './routes/webhook.js'
+import { testRouter } from './routes/test.js'
 
 export const adminRouter = Router()
 
@@ -21,5 +22,6 @@ adminRouter.use('/broadcast', broadcastRouter)
 adminRouter.use('/scheduler', schedulerRouter)
 adminRouter.use('/bot-config', botConfigRouter)
 adminRouter.use('/corrections', correctionsRouter)
+adminRouter.use('/test', testRouter)
 
 export const webhookRouter_ = webhookRouter
