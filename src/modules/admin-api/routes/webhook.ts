@@ -13,14 +13,23 @@ const QUOTATION_MSG: Record<string, MsgFn> = {
   en: (url, insurer) => `Your ${insurer} renewal quote is ready. Get your quote here: ${url}`,
 }
 
+function renderTemplate(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? '')
+}
+
 webhookRouter.post('/w/:token', async (req, res) => {
-  const { rows: wh } = await db.query('SELECT id FROM webhooks WHERE token = $1', [req.params.token])
+  const { rows: wh } = await db.query(
+    'SELECT id, message_template FROM webhooks WHERE token = $1',
+    [req.params.token]
+  )
   if (!wh[0]) return res.status(401).json({ error: 'Invalid token' })
 
-  const { phone, name, car_plate, amount, insurer, quotation_url } = req.body
+  const body: Record<string, string> = req.body
+  const phone = body.phone
   if (!phone) return res.status(400).json({ error: 'phone required' })
 
   const normalizedPhone = phone.replace(/\D/g, '')
+  const { name, car_plate, insurer, amount, quotation_url } = body
 
   const { rows: upserted } = await db.query(
     `INSERT INTO customers (phone, name, car_plate, insurer, source)
@@ -45,26 +54,36 @@ webhookRouter.post('/w/:token', async (req, res) => {
 
   await db.query('UPDATE webhooks SET last_used_at = NOW() WHERE id = $1', [wh[0].id])
 
-  const lang = customer.language ?? 'bm'
-  const displayName = customer.name ? `, ${customer.name}` : ''
-  const insurerStr = insurer ?? 'insurans'
-  const amountStr = amount ? ` (RM${amount})` : ''
-
-  const messages: Record<string, string> = {
-    bm: quotation_url
-      ? `Hai${displayName}! Sebut harga pembaharuan ${insurerStr}${amountStr} anda sedia. Klik untuk lihat: ${quotation_url}`
-      : `Hai${displayName}! Maklumat pembaharuan ${insurerStr}${amountStr} anda telah dikemas kini.`,
-    zh: quotation_url
-      ? `您好${displayName}！您的${insurerStr}续保报价${amountStr}已准备好。点击查看：${quotation_url}`
-      : `您好${displayName}！您的${insurerStr}续保信息${amountStr}已更新。`,
-    en: quotation_url
-      ? `Hi${displayName}! Your ${insurerStr} renewal quote${amountStr} is ready: ${quotation_url}`
-      : `Hi${displayName}! Your ${insurerStr} renewal info${amountStr} has been updated.`,
+  let message: string
+  if (wh[0].message_template) {
+    // Merge all body fields + resolved customer fields for template substitution
+    const vars: Record<string, string> = {
+      ...body,
+      name: customer.name ?? name ?? '',
+      phone: normalizedPhone,
+    }
+    message = renderTemplate(wh[0].message_template, vars)
+  } else {
+    // Default fallback message
+    const lang = customer.language ?? 'bm'
+    const displayName = customer.name ? `, ${customer.name}` : ''
+    const insurerStr = insurer ?? 'insurans'
+    const amountStr = amount ? ` (RM${amount})` : ''
+    const defaults: Record<string, string> = {
+      bm: quotation_url
+        ? `Hai${displayName}! Sebut harga pembaharuan ${insurerStr}${amountStr} anda sedia: ${quotation_url}`
+        : `Hai${displayName}! Maklumat pembaharuan ${insurerStr}${amountStr} anda telah dikemas kini.`,
+      zh: quotation_url
+        ? `您好${displayName}！您的${insurerStr}续保报价${amountStr}已准备好：${quotation_url}`
+        : `您好${displayName}！您的${insurerStr}续保信息已更新。`,
+      en: quotation_url
+        ? `Hi${displayName}! Your ${insurerStr} renewal quote${amountStr} is ready: ${quotation_url}`
+        : `Hi${displayName}! Your ${insurerStr} renewal info has been updated.`,
+    }
+    message = defaults[lang] ?? defaults.bm
   }
 
-  const message = messages[lang] ?? messages.bm
   await sendText(normalizedPhone, message)
-
   res.json({ sent: true, customer_id: customer.id })
 })
 

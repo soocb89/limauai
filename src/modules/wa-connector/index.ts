@@ -8,7 +8,7 @@ import { Boom } from '@hapi/boom'
 import { EventEmitter } from 'events'
 import qrcode from 'qrcode-terminal'
 import { config } from '../../config.js'
-import { setSock } from './sender.js'
+import { setSock, setReady } from './sender.js'
 
 export const waEvents = new EventEmitter()
 
@@ -46,6 +46,7 @@ export async function startWAConnector(): Promise<void> {
     }
 
     if (connection === 'close') {
+      setReady(false)
       const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode
       const loggedOut = statusCode === DisconnectReason.loggedOut
 
@@ -70,6 +71,7 @@ export async function startWAConnector(): Promise<void> {
 
     if (connection === 'open') {
       reconnectAttempts = 0
+      setReady(true)
       console.log('WA: Connected ✓')
       waEvents.emit('ready')
     }
