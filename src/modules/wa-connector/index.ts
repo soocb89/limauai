@@ -13,8 +13,18 @@ import { setWAStatus, setWAQR } from './status.js'
 
 export const waEvents = new EventEmitter()
 
-// Module-level var intentionally — recursive startWAConnector() calls share this binding,
-// so the reset on connection === 'open' correctly clears the count across all call frames.
+// LID (Linked Identity) → phone number resolution map.
+// WA multi-device sends some messages with @lid JIDs instead of phone JIDs.
+// We build this map from contacts.upsert/update events so we can resolve them.
+const lidToPhone = new Map<string, string>()
+
+function registerContact(id?: string, lid?: string) {
+  if (id?.endsWith('@s.whatsapp.net') && lid) {
+    const lidJid = lid.endsWith('@lid') ? lid : `${lid}@lid`
+    lidToPhone.set(lidJid, id.replace('@s.whatsapp.net', ''))
+  }
+}
+
 let reconnectAttempts = 0
 const MAX_RECONNECT = 5
 
@@ -37,6 +47,14 @@ export async function startWAConnector(): Promise<void> {
 
   setSock(sock)
   sock.ev.on('creds.update', saveCreds)
+
+  // Build LID→phone map from contact sync events
+  sock.ev.on('contacts.upsert', (contacts) => {
+    for (const c of contacts) registerContact(c.id, (c as any).lid)
+  })
+  sock.ev.on('contacts.update', (updates) => {
+    for (const c of updates) registerContact(c.id, (c as any).lid)
+  })
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update
@@ -86,25 +104,35 @@ export async function startWAConnector(): Promise<void> {
   })
 
   sock.ev.on('messages.upsert', async ({ messages, type }) => {
-    console.log(`[WA] messages.upsert type=${type} count=${messages.length}`)
     if (type !== 'notify') return
     for (const msg of messages) {
-      const jid = msg.key.remoteJid ?? ''
-      console.log(`[WA] msg jid=${jid} fromMe=${msg.key.fromMe} hasMessage=${!!msg.message}`)
       if (msg.key.fromMe) continue
       if (!msg.message) continue
-      if (!jid.endsWith('@s.whatsapp.net')) {
-        console.log(`[WA] skipping non-user JID: ${jid}`)
-        continue
+
+      let jid = msg.key.remoteJid ?? ''
+
+      // Resolve @lid JID to phone number via contact map
+      if (jid.endsWith('@lid')) {
+        const resolved = lidToPhone.get(jid)
+        if (!resolved) {
+          console.log(`[WA] LID not resolved yet: ${jid} — skipping`)
+          continue
+        }
+        jid = `${resolved}@s.whatsapp.net`
+        console.log(`[WA] resolved LID ${msg.key.remoteJid} → ${jid}`)
       }
+
+      if (!jid.endsWith('@s.whatsapp.net')) continue
+
       const text =
         msg.message.conversation ??
         msg.message.extendedTextMessage?.text ??
         ''
       if (!text) {
-        console.log(`[WA] skipping non-text message type: ${Object.keys(msg.message).join(',')}`)
+        console.log(`[WA] skipping non-text: ${Object.keys(msg.message).join(',')}`)
         continue
       }
+
       const phone = jid.replace('@s.whatsapp.net', '')
       const pushName = msg.pushName ?? null
       console.log(`[WA] incoming from ${phone} (${pushName}): "${text}"`)

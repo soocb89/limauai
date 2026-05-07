@@ -22,6 +22,7 @@ export function useConversations(status?: string) {
   return useQuery<Conversation[]>({
     queryKey: ['conversations', status],
     queryFn: () => apiFetch(path),
+    refetchInterval: 5000,
   })
 }
 
@@ -30,6 +31,7 @@ export function useMessages(conversationId: string | null) {
     queryKey: ['messages', conversationId],
     queryFn: () => apiFetch(`/admin/conversations/${conversationId}/messages`),
     enabled: conversationId !== null,
+    refetchInterval: 3000,
   })
 }
 
