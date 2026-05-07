@@ -10,11 +10,13 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 
 interface SchedulerJob {
-  id: number
-  customer_id: number
-  step: number
-  scheduled_for: string
+  id: string
+  type: string
+  step: string
+  scheduled_at: string
   status: string
+  phone: string
+  name: string | null
 }
 
 export default function SchedulerPage() {
@@ -24,7 +26,7 @@ export default function SchedulerPage() {
     queryFn: () => apiFetch('/admin/scheduler/jobs'),
   })
   const cancelMutation = useMutation({
-    mutationFn: (id: number) => apiFetch(`/admin/scheduler/jobs/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: string) => apiFetch(`/admin/scheduler/jobs/${id}`, { method: 'DELETE' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scheduler-jobs'] }),
   })
 
@@ -39,8 +41,8 @@ export default function SchedulerPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Customer</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Step</TableHead>
               <TableHead>Scheduled</TableHead>
               <TableHead>Status</TableHead>
@@ -50,10 +52,10 @@ export default function SchedulerPage() {
           <TableBody>
             {jobs.map((j) => (
               <TableRow key={j.id}>
-                <TableCell>{j.id}</TableCell>
-                <TableCell>{j.customer_id}</TableCell>
+                <TableCell>{j.name ?? j.phone}</TableCell>
+                <TableCell>{j.type}</TableCell>
                 <TableCell>{j.step}</TableCell>
-                <TableCell>{new Date(j.scheduled_for).toLocaleString()}</TableCell>
+                <TableCell>{new Date(j.scheduled_at).toLocaleString()}</TableCell>
                 <TableCell>
                   <Badge variant={j.status === 'pending' ? 'default' : 'secondary'}>{j.status}</Badge>
                 </TableCell>

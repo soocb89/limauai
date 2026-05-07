@@ -27,7 +27,7 @@ export function CustomerTable({ customers }: Props) {
           <TableHead>Phone</TableHead>
           <TableHead>Language</TableHead>
           <TableHead>Insurer</TableHead>
-          <TableHead>Policy Expiry</TableHead>
+          <TableHead>Renewal Date</TableHead>
           <TableHead>Tags</TableHead>
         </TableRow>
       </TableHeader>
@@ -39,7 +39,7 @@ export function CustomerTable({ customers }: Props) {
             <TableCell>{c.language}</TableCell>
             <TableCell>{c.insurer ?? '—'}</TableCell>
             <TableCell>
-              {c.policy_expiry ? new Date(c.policy_expiry).toLocaleDateString() : '—'}
+              {c.renewal_date ? new Date(c.renewal_date).toLocaleDateString() : '—'}
             </TableCell>
             <TableCell>
               <div className="flex gap-1 flex-wrap">

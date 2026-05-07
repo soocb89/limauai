@@ -16,7 +16,7 @@ import {
 import { toast } from 'sonner'
 
 interface Correction {
-  id: number
+  id: string
   intent: string
   original: string
   corrected: string
@@ -44,7 +44,7 @@ export default function CorrectionsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['corrections'] }),
   })
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiFetch(`/admin/corrections/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: string) => apiFetch(`/admin/corrections/${id}`, { method: 'DELETE' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['corrections'] }),
   })
 

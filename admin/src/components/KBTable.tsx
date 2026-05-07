@@ -16,7 +16,7 @@ interface Props {
 export function KBTable({ entries, onEdit }: Props) {
   const deleteMutation = useDeleteKB()
 
-  async function handleDelete(id: number) {
+  async function handleDelete(id: string) {
     await deleteMutation.mutateAsync(id)
     toast.success('Entry deleted')
   }

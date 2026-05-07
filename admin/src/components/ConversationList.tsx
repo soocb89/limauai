@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 
 interface Props {
   conversations: Conversation[]
-  selectedId: number | null
-  onSelect: (id: number) => void
+  selectedId: string | null
+  onSelect: (id: string) => void
 }
 
 export function ConversationList({ conversations, selectedId, onSelect }: Props) {
@@ -26,7 +26,7 @@ export function ConversationList({ conversations, selectedId, onSelect }: Props)
           )}
         >
           <div className="flex items-center justify-between">
-            <span className="font-medium text-sm">{c.customer_name ?? c.phone}</span>
+            <span className="font-medium text-sm">{c.name ?? c.phone}</span>
             <Badge variant={c.status === 'open' ? 'default' : 'secondary'}>{c.status}</Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">

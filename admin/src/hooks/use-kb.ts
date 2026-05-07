@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/lib/api'
 
 export interface KBEntry {
-  id: number
+  id: string
   title: string
   content: string
   category: string | null
@@ -33,12 +33,12 @@ export function useAddKB() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: { title: string; content: string; category: string }) =>
-      apiFetch<{ id: number }>('/admin/kb', { method: 'POST', body: JSON.stringify(data) }),
+      apiFetch<{ id: string }>('/admin/kb', { method: 'POST', body: JSON.stringify(data) }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['kb'] }),
   })
 }
 
-export function useUpdateKB(id: number) {
+export function useUpdateKB(id: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: { title: string; content: string; category: string }) =>
@@ -50,7 +50,7 @@ export function useUpdateKB(id: number) {
 export function useDeleteKB() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => apiFetch(`/admin/kb/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: string) => apiFetch(`/admin/kb/${id}`, { method: 'DELETE' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['kb'] }),
   })
 }
@@ -63,13 +63,7 @@ export function useUploadKB() {
       form.append('file', file)
       form.append('title', title)
       form.append('category', category)
-      const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
-      const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ''
-      const res = await fetch(`${BASE_URL}/admin/kb/upload`, {
-        method: 'POST',
-        headers: { 'x-api-key': API_KEY },
-        body: form,
-      })
+      const res = await fetch('/admin/kb/upload', { method: 'POST', body: form })
       if (!res.ok) throw new Error(await res.text())
       return res.json() as Promise<{ chunks: number }>
     },

@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 
 interface Props {
-  conversationId: number
+  conversationId: string
   currentStatus: string
 }
 
@@ -25,8 +25,8 @@ export function QuickReply({ conversationId, currentStatus }: Props) {
   }
 
   async function handleClose() {
-    await updateStatus.mutateAsync('closed')
-    toast.success('Conversation closed')
+    await updateStatus.mutateAsync('resolved')
+    toast.success('Conversation resolved')
   }
 
   return (
@@ -58,9 +58,9 @@ export function QuickReply({ conversationId, currentStatus }: Props) {
           <Button onClick={handleSend} disabled={sendReply.isPending || !text.trim()}>
             Send
           </Button>
-          {currentStatus !== 'closed' && (
+          {currentStatus !== 'resolved' && (
             <Button variant="outline" onClick={handleClose} disabled={updateStatus.isPending}>
-              Close
+              Resolve
             </Button>
           )}
         </div>
