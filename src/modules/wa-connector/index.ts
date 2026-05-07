@@ -80,12 +80,14 @@ export async function startWAConnector(): Promise<void> {
     for (const msg of messages) {
       if (msg.key.fromMe) continue
       if (!msg.message) continue
+      const jid = msg.key.remoteJid ?? ''
+      if (!jid.endsWith('@s.whatsapp.net')) continue // skip groups, LIDs, broadcasts
       const text =
         msg.message.conversation ??
         msg.message.extendedTextMessage?.text ??
         ''
       if (!text) continue
-      const phone = msg.key.remoteJid?.replace('@s.whatsapp.net', '') ?? ''
+      const phone = jid.replace('@s.whatsapp.net', '')
       waEvents.emit('message', { phone, text, raw: msg })
     }
   })

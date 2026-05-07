@@ -30,7 +30,7 @@ export function ConversationList({ conversations, selectedId, onSelect }: Props)
             <Badge variant={c.status === 'open' ? 'default' : 'secondary'}>{c.status}</Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {new Date(c.last_message_at).toLocaleString()}
+            {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : '—'}
           </p>
           {c.tags.length > 0 && (
             <div className="flex gap-1 mt-1 flex-wrap">
