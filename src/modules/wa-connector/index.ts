@@ -9,6 +9,7 @@ import { EventEmitter } from 'events'
 import qrcode from 'qrcode-terminal'
 import { config } from '../../config.js'
 import { setSock, setReady } from './sender.js'
+import { setWAStatus, setWAQR } from './status.js'
 
 export const waEvents = new EventEmitter()
 
@@ -18,6 +19,7 @@ let reconnectAttempts = 0
 const MAX_RECONNECT = 5
 
 export async function startWAConnector(): Promise<void> {
+  setWAStatus('connecting')
   const { state, saveCreds } = await useMultiFileAuthState(config.baileys.sessionPath)
   const { version } = await fetchLatestBaileysVersion()
   console.log(`WA: using version ${version.join('.')}`)
@@ -40,6 +42,8 @@ export async function startWAConnector(): Promise<void> {
     const { connection, lastDisconnect, qr } = update
 
     if (qr) {
+      setWAStatus('qr_ready')
+      setWAQR(qr)
       console.log('\n=== SCAN THIS QR WITH WHATSAPP ===')
       qrcode.generate(qr, { small: true })
       console.log('==================================\n')
@@ -47,6 +51,8 @@ export async function startWAConnector(): Promise<void> {
 
     if (connection === 'close') {
       setReady(false)
+      setWAStatus('disconnected')
+      setWAQR(null)
       const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode
       const loggedOut = statusCode === DisconnectReason.loggedOut
 
@@ -72,6 +78,8 @@ export async function startWAConnector(): Promise<void> {
     if (connection === 'open') {
       reconnectAttempts = 0
       setReady(true)
+      setWAStatus('connected')
+      setWAQR(null)
       console.log('WA: Connected ✓')
       waEvents.emit('ready')
     }

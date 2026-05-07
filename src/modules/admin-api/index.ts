@@ -11,6 +11,7 @@ import { correctionsRouter } from './routes/corrections.js'
 import { webhookRouter } from './routes/webhook.js'
 import { testRouter } from './routes/test.js'
 import { webhooksRouter } from './routes/webhooks.js'
+import { waStatusRouter } from './routes/wa-status.js'
 
 export const adminRouter = Router()
 
@@ -25,5 +26,6 @@ adminRouter.use('/bot-config', botConfigRouter)
 adminRouter.use('/corrections', correctionsRouter)
 adminRouter.use('/test', testRouter)
 adminRouter.use('/webhooks', webhooksRouter)
+adminRouter.use('/wa', waStatusRouter)
 
 export const webhookRouter_ = webhookRouter
