@@ -78,19 +78,28 @@ export async function startWAConnector(): Promise<void> {
   })
 
   sock.ev.on('messages.upsert', async ({ messages, type }) => {
+    console.log(`[WA] messages.upsert type=${type} count=${messages.length}`)
     if (type !== 'notify') return
     for (const msg of messages) {
+      const jid = msg.key.remoteJid ?? ''
+      console.log(`[WA] msg jid=${jid} fromMe=${msg.key.fromMe} hasMessage=${!!msg.message}`)
       if (msg.key.fromMe) continue
       if (!msg.message) continue
-      const jid = msg.key.remoteJid ?? ''
-      if (!jid.endsWith('@s.whatsapp.net')) continue // skip groups, LIDs, broadcasts
+      if (!jid.endsWith('@s.whatsapp.net')) {
+        console.log(`[WA] skipping non-user JID: ${jid}`)
+        continue
+      }
       const text =
         msg.message.conversation ??
         msg.message.extendedTextMessage?.text ??
         ''
-      if (!text) continue
+      if (!text) {
+        console.log(`[WA] skipping non-text message type: ${Object.keys(msg.message).join(',')}`)
+        continue
+      }
       const phone = jid.replace('@s.whatsapp.net', '')
       const pushName = msg.pushName ?? null
+      console.log(`[WA] incoming from ${phone} (${pushName}): "${text}"`)
       waEvents.emit('message', { phone, text, pushName, raw: msg })
     }
   })

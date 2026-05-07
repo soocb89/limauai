@@ -9,6 +9,8 @@ export interface Customer {
   insurer: string | null
   renewal_date: string | null
   car_plate: string | null
+  status: 'lead' | 'customer'
+  source: string
   tags: string[]
   custom_fields: Record<string, string>
 }
@@ -29,7 +31,7 @@ export function useCustomers(params?: { search?: string; language?: string; insu
 export function useUpdateCustomer(id: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: Partial<Pick<Customer, 'name' | 'car_plate' | 'insurer' | 'renewal_date' | 'tags' | 'custom_fields'>>) =>
+    mutationFn: (data: Partial<Pick<Customer, 'name' | 'car_plate' | 'insurer' | 'renewal_date' | 'tags' | 'custom_fields' | 'status'>>) =>
       apiFetch(`/admin/customers/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['customers'] }),
   })

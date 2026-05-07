@@ -24,7 +24,8 @@ webhookRouter.post('/w/:token', async (req, res) => {
   )
   if (!wh[0]) return res.status(401).json({ error: 'Invalid token' })
 
-  const body: Record<string, string> = req.body
+  // Accept JSON body OR query string (e.g. from Postman Params tab)
+  const body: Record<string, string> = { ...req.query as Record<string, string>, ...req.body }
   const phone = body.phone
   if (!phone) return res.status(400).json({ error: 'phone required' })
 

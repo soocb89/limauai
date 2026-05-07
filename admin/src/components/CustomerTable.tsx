@@ -37,6 +37,11 @@ function EditableRow({ c }: { c: Customer }) {
     setEditing(false)
   }
 
+  async function promote() {
+    await update.mutateAsync({ status: 'customer' })
+    toast.success('Converted to customer')
+  }
+
   function cancel() {
     setName(c.name ?? ''); setCarPlate(c.car_plate ?? '')
     setTags(c.tags); setCustomFields(c.custom_fields ?? {})
@@ -68,7 +73,14 @@ function EditableRow({ c }: { c: Customer }) {
           ? <Input value={name} onChange={e => setName(e.target.value)} className="h-7 text-sm w-36" />
           : <span>{c.name ?? '—'}</span>}
       </TableCell>
-      <TableCell>{c.phone}</TableCell>
+      <TableCell>
+        <div className="flex flex-col gap-0.5">
+          <span>{c.phone}</span>
+          <Badge variant={c.status === 'customer' ? 'default' : 'secondary'} className="text-xs w-fit">
+            {c.status}
+          </Badge>
+        </div>
+      </TableCell>
       <TableCell>{c.language}</TableCell>
       <TableCell>{c.insurer ?? '—'}</TableCell>
       <TableCell>
@@ -129,9 +141,16 @@ function EditableRow({ c }: { c: Customer }) {
             </Button>
           </div>
         ) : (
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditing(true)}>
-            <Pencil className="h-3 w-3" />
-          </Button>
+          <div className="flex gap-1">
+            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditing(true)}>
+              <Pencil className="h-3 w-3" />
+            </Button>
+            {c.status === 'lead' && (
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={promote} disabled={update.isPending}>
+                → Customer
+              </Button>
+            )}
+          </div>
         )}
       </TableCell>
     </TableRow>

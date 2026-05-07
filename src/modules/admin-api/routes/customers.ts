@@ -31,7 +31,7 @@ customersRouter.get('/', async (req, res) => {
 
   const countSql = `SELECT COUNT(*)::int AS total FROM customers ${where}`
   const dataSql = `SELECT id, phone, name, email, language, renewal_date, car_plate, insurer,
-                          consent, source, tags, custom_fields, created_at
+                          consent, source, status, tags, custom_fields, created_at
                    FROM customers ${where}
                    ORDER BY created_at DESC
                    LIMIT ${limit} OFFSET ${offset}`
@@ -80,7 +80,7 @@ customersRouter.put('/:id', async (req, res) => {
 })
 
 customersRouter.patch('/:id', async (req, res) => {
-  const allowed = ['name', 'email', 'language', 'renewal_date', 'car_plate', 'insurer', 'consent', 'tags', 'custom_fields']
+  const allowed = ['name', 'email', 'language', 'renewal_date', 'car_plate', 'insurer', 'consent', 'tags', 'custom_fields', 'status']
   const updates: string[] = []
   const params: unknown[] = []
   for (const key of allowed) {
