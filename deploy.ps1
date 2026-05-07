@@ -24,18 +24,20 @@ npm run build
 Write-Host "==> Running migrations..." -ForegroundColor Cyan
 node dist/db/migrate.js
 
-Write-Host "==> Starting backend with PM2..." -ForegroundColor Cyan
-pm2 delete limauai 2>$null; $true   # ignore error if not running
-pm2 start ecosystem.config.cjs
-pm2 save
+Write-Host "==> Seeding default bot config..." -ForegroundColor Cyan
+node dist/db/seed.js
 
 Write-Host "==> Building admin UI..." -ForegroundColor Cyan
 Set-Location "$root\admin"
 npm run build
 
-Write-Host "==> Starting admin UI with PM2..." -ForegroundColor Cyan
+Set-Location $root
+
+Write-Host "==> Starting all processes with PM2..." -ForegroundColor Cyan
+pm2 delete limauai 2>$null; $true
 pm2 delete limauai-admin 2>$null; $true
-pm2 start --name limauai-admin --interpreter none -- node_modules/.bin/next start -p 3000
+pm2 delete cloudflared 2>$null; $true
+pm2 start ecosystem.config.cjs
 pm2 save
 
 Set-Location $root
