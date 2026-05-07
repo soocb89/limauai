@@ -2,9 +2,14 @@ import express from 'express'
 import { startWAConnector, waEvents } from './modules/wa-connector/index.js'
 import { handleIncomingMessage } from './pipeline.js'
 import { config } from './config.js'
+import { adminRouter, webhookRouter_ } from './modules/admin-api/index.js'
+import { startWorkers } from './modules/scheduler/index.js'
 
 const app = express()
 app.use(express.json())
+
+app.use('/admin', adminRouter)
+app.use('/webhook', webhookRouter_)
 
 waEvents.on('message', async ({ phone, text }: { phone: string; text: string }) => {
   try {
@@ -23,3 +28,4 @@ app.listen(config.port, () => {
 })
 
 startWAConnector().catch(console.error)
+startWorkers()

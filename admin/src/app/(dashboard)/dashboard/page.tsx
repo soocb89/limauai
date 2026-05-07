@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function DashboardPage() {
   const [status, setStatus] = useState('open')
-  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const { data: conversations = [], isLoading } = useConversations(status)
   const selected = conversations.find((c) => c.id === selectedId)
 
@@ -19,8 +19,8 @@ export default function DashboardPage() {
           <Tabs value={status} onValueChange={setStatus}>
             <TabsList className="w-full">
               <TabsTrigger value="open" className="flex-1">Open</TabsTrigger>
-              <TabsTrigger value="held" className="flex-1">Held</TabsTrigger>
-              <TabsTrigger value="closed" className="flex-1">Closed</TabsTrigger>
+              <TabsTrigger value="handoff" className="flex-1">Handoff</TabsTrigger>
+              <TabsTrigger value="resolved" className="flex-1">Resolved</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>

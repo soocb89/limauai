@@ -42,12 +42,15 @@ export async function triggerHandoff(params: {
     [params.conversationId]
   )
 
-  await sendText(params.phone, holdMsg)
-
   const ownerAlert =
     `⚠️ Handoff needed: ${params.customerName ?? params.phone} (${params.phone})\n` +
     `Intent: ${params.intent} | Language: ${params.language}\n` +
     `Last message: ${params.lastMessage.slice(0, 100)}`
 
-  await sendText(config.owner.phone, ownerAlert)
+  const results = await Promise.allSettled([
+    sendText(params.phone, holdMsg),
+    sendText(config.owner.phone, ownerAlert),
+  ])
+  if (results[0].status === 'rejected') console.error('Handoff: failed to send hold msg to customer', results[0].reason)
+  if (results[1].status === 'rejected') console.error('Handoff: failed to send alert to owner', results[1].reason)
 }

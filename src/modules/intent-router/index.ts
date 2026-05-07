@@ -5,6 +5,8 @@ import { INTENTS } from './types.js'
 import type { MessageRow } from '../context-manager/types.js'
 
 
+const openai = new OpenAI({ apiKey: config.openai.apiKey })
+
 const SYSTEM_PROMPT = `You are an intent classifier for a Malaysian car insurance renewal chatbot.
 
 Classify the user's message into exactly one of these intents:
@@ -28,7 +30,6 @@ export async function classifyIntent(
   text: string,
   recentMessages: MessageRow[]
 ): Promise<IntentResult> {
-  const openai = new OpenAI({ apiKey: config.openai.apiKey })
   const history = recentMessages.slice(-5).map(m => ({
     role: m.role === 'bot' ? 'assistant' as const : 'user' as const,
     content: m.content,

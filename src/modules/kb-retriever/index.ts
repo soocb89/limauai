@@ -14,6 +14,7 @@ export async function retrieveKB(query: string, topK = 3): Promise<KBChunk[]> {
   const { rows } = await db.query<KBChunk>(
     `SELECT id, title, content
      FROM knowledge_base
+     WHERE embedding <=> $1::vector < 0.5
      ORDER BY embedding <=> $1::vector
      LIMIT $2`,
     [embeddingLiteral, topK]

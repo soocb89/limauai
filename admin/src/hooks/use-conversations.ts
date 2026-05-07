@@ -2,16 +2,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/lib/api'
 
 export interface Conversation {
-  id: number
+  id: string
   phone: string
-  customer_name: string | null
-  status: 'open' | 'closed' | 'held'
+  name: string | null
+  status: 'open' | 'handoff' | 'resolved'
   last_message_at: string
   tags: string[]
 }
 
 export interface Message {
-  id: number
+  id: string
   role: 'user' | 'assistant'
   content: string
   created_at: string
@@ -25,7 +25,7 @@ export function useConversations(status?: string) {
   })
 }
 
-export function useMessages(conversationId: number | null) {
+export function useMessages(conversationId: string | null) {
   return useQuery<Message[]>({
     queryKey: ['messages', conversationId],
     queryFn: () => apiFetch(`/admin/conversations/${conversationId}/messages`),
@@ -33,19 +33,19 @@ export function useMessages(conversationId: number | null) {
   })
 }
 
-export function useSendReply(conversationId: number) {
+export function useSendReply(conversationId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (message: string) =>
       apiFetch(`/admin/conversations/${conversationId}/reply`, {
         method: 'POST',
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ text: message }),
       }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['messages', conversationId] }),
   })
 }
 
-export function useUpdateStatus(conversationId: number) {
+export function useUpdateStatus(conversationId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (status: string) =>

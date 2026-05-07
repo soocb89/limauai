@@ -8,28 +8,40 @@ export const customersRouter = Router()
 const upload = multer({ storage: multer.memoryStorage() })
 
 customersRouter.get('/', async (req, res) => {
-  const { search, language, insurer } = req.query
-  let sql = `SELECT id, phone, name, email, language, renewal_date, car_plate, insurer,
-                    consent, source, created_at
-             FROM customers WHERE 1=1`
+  const { search, language, insurer, page, limit: limitParam } = req.query
+  const limit = Math.min(parseInt(String(limitParam ?? '50'), 10) || 50, 200)
+  const offset = (Math.max(parseInt(String(page ?? '1'), 10) || 1, 1) - 1) * limit
+  const pageNum = Math.floor(offset / limit) + 1
+
+  let where = 'WHERE 1=1'
   const params: unknown[] = []
 
   if (search) {
     params.push(`%${search}%`)
-    sql += ` AND (phone ILIKE $${params.length} OR name ILIKE $${params.length})`
+    where += ` AND (phone ILIKE $${params.length} OR name ILIKE $${params.length})`
   }
   if (language) {
     params.push(language)
-    sql += ` AND language = $${params.length}`
+    where += ` AND language = $${params.length}`
   }
   if (insurer) {
     params.push(insurer)
-    sql += ` AND insurer = $${params.length}`
+    where += ` AND insurer = $${params.length}`
   }
 
-  sql += ' ORDER BY created_at DESC LIMIT 100'
-  const { rows } = await db.query(sql, params)
-  res.json(rows)
+  const countSql = `SELECT COUNT(*)::int AS total FROM customers ${where}`
+  const dataSql = `SELECT id, phone, name, email, language, renewal_date, car_plate, insurer,
+                          consent, source, created_at
+                   FROM customers ${where}
+                   ORDER BY created_at DESC
+                   LIMIT ${limit} OFFSET ${offset}`
+
+  const [{ rows: countRows }, { rows }] = await Promise.all([
+    db.query(countSql, params),
+    db.query(dataSql, params),
+  ])
+
+  res.json({ data: rows, total: countRows[0].total, page: pageNum, limit })
 })
 
 customersRouter.get('/:id', async (req, res) => {
