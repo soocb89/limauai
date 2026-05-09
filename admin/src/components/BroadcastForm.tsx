@@ -22,6 +22,8 @@ export function BroadcastForm() {
   const { data: stats } = useBroadcastStats(promotionId)
   const sendMutation = useSendBroadcast()
 
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null)
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { message: '' },
@@ -29,9 +31,7 @@ export function BroadcastForm() {
 
   async function onSubmit(data: FormData) {
     if (!promotionId) { toast.error('Select a promotion'); return }
-    const result = await sendMutation.mutateAsync({ promotionId, message: data.message })
-    toast.success(`Queued ${result.queued} messages`)
-    reset()
+    setPendingMessage(data.message)
   }
 
   return (
@@ -60,9 +60,34 @@ export function BroadcastForm() {
           <Textarea {...register('message')} rows={5} placeholder="Broadcast message…" />
           {errors.message && <p className="text-sm text-destructive">{errors.message.message}</p>}
         </div>
-        <Button type="submit" disabled={sendMutation.isPending || !promotionId}>
-          {sendMutation.isPending ? 'Sending…' : 'Send Broadcast'}
-        </Button>
+        {pendingMessage ? (
+          <div className="space-y-3 rounded-md border border-yellow-300 bg-yellow-50 p-3">
+            <p className="text-sm font-medium">Confirm broadcast to {stats?.total ?? '…'} recipients</p>
+            <p className="text-sm text-muted-foreground break-words">{pendingMessage.slice(0, 100)}{pendingMessage.length > 100 ? '…' : ''}</p>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={sendMutation.isPending}
+                onClick={async () => {
+                  const result = await sendMutation.mutateAsync({ promotionId: promotionId!, message: pendingMessage })
+                  toast.success(`Queued ${result.queued} messages`)
+                  setPendingMessage(null)
+                  reset()
+                }}
+              >
+                {sendMutation.isPending ? 'Sending…' : 'Confirm Send'}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setPendingMessage(null)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button type="submit" disabled={sendMutation.isPending || !promotionId}>
+            Send Broadcast
+          </Button>
+        )}
       </form>
     </div>
   )

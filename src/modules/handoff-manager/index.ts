@@ -53,4 +53,13 @@ export async function triggerHandoff(params: {
   ])
   if (results[0].status === 'rejected') console.error('Handoff: failed to send hold msg to customer', results[0].reason)
   if (results[1].status === 'rejected') console.error('Handoff: failed to send alert to owner', results[1].reason)
+
+  const { handoffAlertQueue } = await import('../scheduler/index.js')
+  await handoffAlertQueue.add('handoff-alert', {
+    conversationId: params.conversationId,
+    customerName: params.customerName,
+    phone: params.phone,
+    handoffTriggeredAt: new Date().toISOString(),
+    alertCount: 0,
+  }, { delay: 30 * 60 * 1000 })
 }

@@ -85,6 +85,27 @@ webhookRouter.post('/w/:token', async (req, res) => {
   }
 
   await sendText(normalizedPhone, message)
+
+  // Persist sent message into conversation history
+  const { rows: convRows } = await db.query(
+    `SELECT id FROM conversations WHERE customer_id = $1 AND status IN ('open','handoff') ORDER BY created_at DESC LIMIT 1`,
+    [customer.id]
+  )
+  let conversationId: string
+  if (convRows.length > 0) {
+    conversationId = convRows[0].id
+  } else {
+    const { rows: newConv } = await db.query(
+      `INSERT INTO conversations (customer_id) VALUES ($1) RETURNING id`,
+      [customer.id]
+    )
+    conversationId = newConv[0].id
+  }
+  await db.query(
+    `INSERT INTO messages (conversation_id, role, content, language) VALUES ($1,'bot',$2,$3)`,
+    [conversationId, message, customer.language ?? 'bm']
+  )
+
   res.json({ sent: true, customer_id: customer.id })
 })
 

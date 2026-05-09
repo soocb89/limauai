@@ -3,6 +3,7 @@ import { apiFetch } from '@/lib/api'
 
 export interface Conversation {
   id: string
+  customer_id: string
   phone: string
   name: string | null
   status: 'open' | 'handoff' | 'resolved'
@@ -14,6 +15,7 @@ export interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
+  media_url: string | null
   created_at: string
 }
 
@@ -56,5 +58,25 @@ export function useUpdateStatus(conversationId: string) {
         body: JSON.stringify({ status }),
       }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['conversations'] }),
+  })
+}
+
+export function useUpdateCustomerName(customerId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (name: string) =>
+      apiFetch(`/admin/customers/${customerId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ name }),
+      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['conversations'] }),
+  })
+}
+
+export function useConversationCounts() {
+  return useQuery<Record<string, number>>({
+    queryKey: ['conversation-counts'],
+    queryFn: () => apiFetch('/admin/conversations/counts'),
+    refetchInterval: 5000,
   })
 }

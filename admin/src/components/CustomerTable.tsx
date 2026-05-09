@@ -70,7 +70,7 @@ function EditableRow({ c }: { c: Customer }) {
     <TableRow>
       <TableCell>
         {editing
-          ? <Input value={name} onChange={e => setName(e.target.value)} className="h-7 text-sm w-36" />
+          ? <Input value={name} onChange={e => setName(e.target.value)} className="h-7 text-sm w-36" autoComplete="off" />
           : <span>{c.name ?? '—'}</span>}
       </TableCell>
       <TableCell>

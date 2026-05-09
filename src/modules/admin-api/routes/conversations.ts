@@ -3,11 +3,22 @@ import { db } from '../../../db/index.js'
 
 export const conversationsRouter = Router()
 
+conversationsRouter.get('/counts', async (_req, res) => {
+  const result = await db.query<{ status: string; count: string }>(
+    `SELECT status, COUNT(*) as count FROM conversations GROUP BY status`
+  )
+  const counts: Record<string, number> = { open: 0, handoff: 0, resolved: 0 }
+  for (const row of result.rows) {
+    counts[row.status] = parseInt(row.count, 10)
+  }
+  res.json(counts)
+})
+
 conversationsRouter.get('/', async (req, res) => {
   const { status } = req.query
   let sql = `
     SELECT c.id, c.status, c.tags, c.created_at, c.updated_at,
-           cu.phone, cu.name, cu.language,
+           c.customer_id, cu.phone, cu.name, cu.language,
            (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.role = 'user') AS message_count
     FROM conversations c
     JOIN customers cu ON cu.id = c.customer_id
@@ -26,7 +37,7 @@ conversationsRouter.get('/', async (req, res) => {
 
 conversationsRouter.get('/:id/messages', async (req, res) => {
   const { rows } = await db.query(
-    `SELECT id, role, content, intent, language, confidence, created_at
+    `SELECT id, role, content, intent, language, confidence, media_url, created_at
      FROM messages WHERE conversation_id = $1 ORDER BY created_at ASC`,
     [req.params.id]
   )
@@ -50,10 +61,6 @@ conversationsRouter.post('/:id/reply', async (req, res) => {
   await db.query(
     `INSERT INTO messages (conversation_id, role, content) VALUES ($1, 'bot', $2)`,
     [req.params.id, text]
-  )
-  await db.query(
-    `UPDATE conversations SET status = 'open', updated_at = NOW() WHERE id = $1`,
-    [req.params.id]
   )
 
   res.json({ sent: true })

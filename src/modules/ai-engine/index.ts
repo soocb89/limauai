@@ -14,8 +14,9 @@ interface GenerateReplyInput {
   context: MessageRow[]
   kbChunks: KBChunk[]
   corrections: Array<{ corrected_reply: string; intent: string }>
-  botConfig: { tone: string; persona_name: string; language_fallback: string }
+  botConfig: { tone: string; persona_name: string; language_fallback: string; custom_instructions?: string }
   useGpt4: boolean
+  imageData?: { buffer: Buffer; mimetype: string }
 }
 
 export async function generateReply(input: GenerateReplyInput): Promise<string> {
@@ -32,18 +33,41 @@ export async function generateReply(input: GenerateReplyInput): Promise<string> 
     content: m.content,
   }))
 
+  const userContent = input.imageData
+    ? [
+        { type: 'image_url' as const, image_url: { url: `data:${input.imageData.mimetype};base64,${input.imageData.buffer.toString('base64')}` } },
+        { type: 'text' as const, text: input.userMessage || 'Tolong bantu saya dengan imej ini.' },
+      ]
+    : input.userMessage
+
   const response = await openai.chat.completions.create({
-    model: input.useGpt4 ? 'gpt-4o' : 'gpt-4o-mini',
+    model: (input.useGpt4 || input.imageData) ? 'gpt-4o' : 'gpt-4o-mini',
     messages: [
       { role: 'system', content: systemPrompt },
       ...history,
-      { role: 'user', content: input.userMessage },
+      { role: 'user', content: userContent },
     ],
     temperature: 0.7,
-    max_tokens: 300,
+    max_tokens: input.imageData ? 500 : 300,
   })
 
   return response.choices[0].message.content ?? ''
+}
+
+export async function extractImageContext(imageBuffer: Buffer, mimetype: string, caption: string): Promise<string> {
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'image_url', image_url: { url: `data:${mimetype};base64,${imageBuffer.toString('base64')}` } },
+        { type: 'text', text: `Caption: "${caption}". In 1-2 sentences, describe what insurance or roadtax related information the customer is asking about or showing. Be specific about any visible numbers, dates, or document types.` },
+      ],
+    }],
+    temperature: 0,
+    max_tokens: 150,
+  })
+  return response.choices[0].message.content ?? caption
 }
 
 export async function loadBotConfig(): Promise<Record<string, string>> {

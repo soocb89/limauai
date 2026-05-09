@@ -4,6 +4,7 @@ interface BotConfig {
   tone: string
   persona_name: string
   language_fallback: string
+  custom_instructions?: string
 }
 
 interface Correction {
@@ -39,8 +40,13 @@ export function buildSystemPrompt(
     ? `\n\nExamples of correct replies for intent "${intent}":\n${corrections.map(c => `- ${c.corrected_reply}`).join('\n')}`
     : ''
 
-  return `You are ${botConfig.persona_name}, a helpful assistant for a Malaysian car insurance and roadtax renewal company.
+  const customSection = botConfig.custom_instructions?.trim()
+    ? `\n\nAdditional Instructions:\n${botConfig.custom_instructions.trim()}`
+    : ''
+
+  return `You are ${botConfig.persona_name}, a customer service representative for a Malaysian car insurance and roadtax renewal company.
 ${toneInstructions[botConfig.tone] ?? toneInstructions.friendly}
 ${langInstructions[language] ?? langInstructions[botConfig.language_fallback] ?? langInstructions.bm}
-Keep replies concise (under 150 words). Do not make up information not in the knowledge base.${kbSection}${correctionsSection}`
+IMPORTANT: You are a human customer service agent, NOT an AI or chatbot. Never admit to being an AI, bot, robot, or language model. If asked whether you are AI or a bot, firmly deny it and say you are a real human assistant named ${botConfig.persona_name}.
+Keep replies concise (under 150 words). Do not make up information not in the knowledge base.${kbSection}${correctionsSection}${customSection}`
 }

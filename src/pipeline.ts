@@ -10,7 +10,9 @@ import {
   generateReply,
   loadBotConfig,
   loadCorrections,
+  extractImageContext,
 } from './modules/ai-engine/index.js'
+import { preFilter } from './modules/ai-engine/pre-filter.js'
 import {
   shouldHandoff,
   containsHandoffKeyword,
@@ -38,6 +40,7 @@ async function handleConsentReply(
        AND fj.type = 'renewal_reminder'
        AND fj.step = 't30'
        AND fj.status = 'sent'
+       AND fj.sent_at > NOW() - INTERVAL '48 hours'
        AND c.consent = false`,
     [customerId]
   )
@@ -76,7 +79,8 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
   if (!customer.language || customer.language !== language) {
     params.push(language); updates.push(`language = $${params.length}`)
   }
-  if (pushName && !customer.name) {
+  // Always sync pushName — overrides placeholder names like "Add your name in the body"
+  if (pushName && pushName !== customer.name) {
     params.push(pushName); updates.push(`name = $${params.length}`)
   }
   if (updates.length) {
@@ -84,48 +88,47 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
     await db.query(`UPDATE customers SET ${updates.join(', ')} WHERE id = $${params.length}`, params)
   }
 
-  const context = await loadContext(customer.id)
+  const [context, botConfig] = await Promise.all([
+    loadContext(customer.id),
+    loadBotConfig(),
+  ])
   await saveMessage({ conversationId: context.conversationId, role: 'user', content: text, language })
+
+  // Admin has taken over — save message for history but don't reply
+  if (context.status === 'handoff') return
 
   const consentHandled = await handleConsentReply(customer.id, context.conversationId, text, language)
   if (consentHandled) return
 
+  // Pre-filter: identity/jailbreak → hard-coded reply, no OpenAI cost
+  const filtered = preFilter(text, language, botConfig.persona_name ?? 'Aina')
+  if (filtered) {
+    await sendText(phone, filtered)
+    await saveMessage({ conversationId: context.conversationId, role: 'bot', content: filtered, language, confidence: 1 })
+    return
+  }
+
   if (containsHandoffKeyword(text)) {
     const { rows: customerRows } = await db.query('SELECT name FROM customers WHERE id = $1', [customer.id])
     await triggerHandoff({
-      phone,
-      customerId: customer.id,
-      conversationId: context.conversationId,
-      customerName: customerRows[0]?.name ?? null,
-      intent: 'escalation',
-      language,
-      lastMessage: text,
+      phone, customerId: customer.id, conversationId: context.conversationId,
+      customerName: customerRows[0]?.name ?? null, intent: 'escalation', language, lastMessage: text,
     })
     return
   }
 
   const intentResult = await classifyIntent(text, context.messages)
-  const botConfig = await loadBotConfig()
   const threshold = parseFloat(botConfig.handoff_threshold ?? '0.6')
 
   if (shouldHandoff(intentResult, context.consecutiveUnknowns, threshold)) {
     const { rows: customerRows } = await db.query('SELECT name FROM customers WHERE id = $1', [customer.id])
     await triggerHandoff({
-      phone,
-      customerId: customer.id,
-      conversationId: context.conversationId,
-      customerName: customerRows[0]?.name ?? null,
-      intent: intentResult.intent,
-      language,
-      lastMessage: text,
+      phone, customerId: customer.id, conversationId: context.conversationId,
+      customerName: customerRows[0]?.name ?? null, intent: intentResult.intent, language, lastMessage: text,
     })
     await saveMessage({
-      conversationId: context.conversationId,
-      role: 'system',
-      content: '[handoff triggered]',
-      intent: intentResult.intent,
-      language,
-      confidence: intentResult.confidence,
+      conversationId: context.conversationId, role: 'system', content: '[handoff triggered]',
+      intent: intentResult.intent, language, confidence: intentResult.confidence,
     })
     return
   }
@@ -146,6 +149,7 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
       tone: botConfig.tone ?? 'friendly',
       persona_name: botConfig.persona_name ?? 'Aina',
       language_fallback: botConfig.language_fallback ?? 'bm',
+      custom_instructions: botConfig.custom_instructions ?? '',
     },
     useGpt4: COMPLEX_INTENTS.has(intentResult.intent),
   })
@@ -162,4 +166,104 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
   })
 
   await tagConversation(context.conversationId, intentResult.intent, language)
+}
+
+export async function handleIncomingImageMessage(
+  phone: string,
+  imageBuffer: Buffer,
+  mimetype: string,
+  caption: string,
+  pushName?: string | null
+): Promise<void> {
+  const customer = await getOrCreateCustomer(phone)
+  const language = caption ? detectLanguage(caption) : 'bm'
+
+  if (pushName && pushName !== customer.name) {
+    await db.query(`UPDATE customers SET name = $1 WHERE id = $2`, [pushName, customer.id])
+  }
+
+  const [context, botConfig] = await Promise.all([
+    loadContext(customer.id),
+    loadBotConfig(),
+  ])
+
+  await saveMessage({
+    conversationId: context.conversationId,
+    role: 'user',
+    content: caption || '[image]',
+    language,
+    mediaUrl: `data:${mimetype};base64,${imageBuffer.toString('base64')}`,
+  })
+
+  if (context.status === 'handoff') return
+
+  const imageContext = await extractImageContext(imageBuffer, mimetype, caption)
+  const [kbChunks, corrections] = await Promise.all([
+    retrieveKB(imageContext),
+    loadCorrections('document_upload'),
+  ])
+
+  const reply = await generateReply({
+    userMessage: caption || imageContext,
+    language,
+    intent: 'document_upload',
+    context: context.messages,
+    kbChunks,
+    corrections,
+    botConfig: {
+      tone: botConfig.tone ?? 'friendly',
+      persona_name: botConfig.persona_name ?? 'Aina',
+      language_fallback: botConfig.language_fallback ?? 'bm',
+      custom_instructions: botConfig.custom_instructions ?? '',
+    },
+    useGpt4: false,
+    imageData: { buffer: imageBuffer, mimetype },
+  })
+
+  await sendText(phone, reply)
+  await saveMessage({ conversationId: context.conversationId, role: 'bot', content: reply, intent: 'document_upload', language, confidence: 1 })
+  await tagConversation(context.conversationId, 'document_upload', language)
+}
+
+export async function handleIncomingPdfMessage(
+  phone: string,
+  pdfBuffer: Buffer,
+  pushName?: string | null
+): Promise<void> {
+  let extractedText = ''
+  try {
+    const { default: pdfParse } = await import('pdf-parse') as any
+    const data = await pdfParse(pdfBuffer)
+    extractedText = data.text.slice(0, 3000).trim()
+  } catch (err) {
+    console.error('[PDF] extraction failed:', err)
+    const { sendText } = await import('./modules/wa-connector/sender.js')
+    await sendText(phone, 'Maaf, kami tidak dapat membaca PDF anda. Sila hantar dalam format teks. / Sorry, we could not read your PDF. Please send as text.')
+    return
+  }
+
+  if (!extractedText) {
+    const { sendText } = await import('./modules/wa-connector/sender.js')
+    await sendText(phone, 'PDF anda kelihatan kosong atau tidak dapat dibaca. Sila cuba lagi. / Your PDF appears empty or unreadable. Please try again.')
+    return
+  }
+
+  await handleIncomingMessage(phone, `[PDF content]: ${extractedText}`, pushName)
+}
+
+export async function handleIncomingVideoMessage(
+  phone: string,
+  videoBuffer: Buffer,
+  caption: string,
+  pushName?: string | null
+): Promise<void> {
+  try {
+    const { extractVideoFrame } = await import('./utils/extract-frame.js')
+    const frameBuffer = await extractVideoFrame(videoBuffer)
+    await handleIncomingImageMessage(phone, frameBuffer, 'image/jpeg', caption, pushName)
+  } catch (err) {
+    console.error('[Video] frame extraction failed:', err)
+    const { sendText } = await import('./modules/wa-connector/sender.js')
+    await sendText(phone, 'Maaf, kami tidak dapat memproses video anda. Sila hantar gambar atau huraikan masalah anda dalam teks. / Sorry, we could not process your video. Please send a screenshot or describe your issue in text.')
+  }
 }

@@ -5,7 +5,7 @@ export async function getOrCreateConversation(customerId: string) {
   const { rows } = await db.query(
     `SELECT id, customer_id, status, tags
      FROM conversations
-     WHERE customer_id = $1 AND status = 'open'
+     WHERE customer_id = $1 AND status IN ('open', 'handoff')
      ORDER BY created_at DESC LIMIT 1`,
     [customerId]
   )
@@ -23,7 +23,7 @@ export async function loadContext(customerId: string): Promise<ConversationConte
   const conversation = await getOrCreateConversation(customerId)
 
   const { rows: messages } = await db.query<MessageRow>(
-    `SELECT id, conversation_id, role, content, intent, language, confidence, created_at
+    `SELECT id, conversation_id, role, content, intent, language, confidence, media_url, created_at
      FROM messages
      WHERE conversation_id = $1
      ORDER BY created_at ASC
@@ -36,6 +36,7 @@ export async function loadContext(customerId: string): Promise<ConversationConte
   return {
     conversationId: conversation.id,
     customerId,
+    status: conversation.status,
     messages,
     consecutiveUnknowns,
   }
@@ -48,12 +49,13 @@ export async function saveMessage(params: {
   intent?: string
   language?: string
   confidence?: number
+  mediaUrl?: string
 }): Promise<MessageRow> {
   const { rows } = await db.query<MessageRow>(
-    `INSERT INTO messages (conversation_id, role, content, intent, language, confidence)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO messages (conversation_id, role, content, intent, language, confidence, media_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [params.conversationId, params.role, params.content, params.intent ?? null, params.language ?? null, params.confidence ?? null]
+    [params.conversationId, params.role, params.content, params.intent ?? null, params.language ?? null, params.confidence ?? null, params.mediaUrl ?? null]
   )
   return rows[0]
 }

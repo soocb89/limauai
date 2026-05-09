@@ -3,6 +3,7 @@ import { redis } from '../../redis/index.js'
 import { db } from '../../db/index.js'
 import { processRenewalStep } from './renewal.js'
 import { processBroadcastMessage } from './broadcast.js'
+import { processHandoffAlert } from './handoff-alert.js'
 
 export const renewalQueue = new Queue('renewal', {
   connection: redis,
@@ -11,6 +12,10 @@ export const renewalQueue = new Queue('renewal', {
 export const broadcastQueue = new Queue('broadcast', {
   connection: redis,
   defaultJobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5000 } },
+})
+export const handoffAlertQueue = new Queue('handoff-alert', {
+  connection: redis,
+  defaultJobOptions: { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
 })
 
 async function pollDueRenewalJobs() {
@@ -49,6 +54,10 @@ export function startWorkers() {
     connection: redis,
     limiter: { max: 10, duration: 60_000 },
   })
+
+  new Worker('handoff-alert', async (job) => {
+    await processHandoffAlert(job.data)
+  }, { connection: redis })
 
   pollDueRenewalJobs()
   setInterval(pollDueRenewalJobs, 60_000)
