@@ -20,14 +20,14 @@ import {
 } from 'lucide-react'
 
 const NAV = [
-  { href: '/dashboard', label: 'Conversations', icon: MessageSquare },
-  { href: '/customers', label: 'Customers', icon: Users },
-  { href: '/knowledge-base', label: 'Knowledge Base', icon: BookOpen },
-  { href: '/promotions', label: 'Promotions', icon: Megaphone },
-  { href: '/broadcast', label: 'Broadcast', icon: Zap },
-  { href: '/scheduler', label: 'Scheduler', icon: Clock },
-  { href: '/webhooks', label: 'Webhooks', icon: Webhook },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/dashboard', label: 'Conversations', icon: MessageSquare, adminOnly: false },
+  { href: '/customers', label: 'Customers', icon: Users, adminOnly: false },
+  { href: '/knowledge-base', label: 'Knowledge Base', icon: BookOpen, adminOnly: true },
+  { href: '/promotions', label: 'Promotions', icon: Megaphone, adminOnly: false },
+  { href: '/broadcast', label: 'Broadcast', icon: Zap, adminOnly: true },
+  { href: '/scheduler', label: 'Scheduler', icon: Clock, adminOnly: true },
+  { href: '/webhooks', label: 'Webhooks', icon: Webhook, adminOnly: true },
+  { href: '/settings', label: 'Settings', icon: Settings, adminOnly: true },
 ]
 
 function ThemeToggle() {
@@ -35,11 +35,9 @@ function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
-
   if (!mounted) return null
 
   const isDark = theme === 'dark'
-
   return (
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
@@ -51,7 +49,7 @@ function ThemeToggle() {
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ role }: { role: 'admin' | 'agent' }) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -60,13 +58,15 @@ export function Sidebar() {
     router.push('/login')
   }
 
+  const visibleNav = role === 'admin' ? NAV : NAV.filter(n => !n.adminOnly)
+
   return (
     <aside className="w-56 shrink-0 border-r bg-sidebar flex flex-col h-[100dvh] sticky top-0">
       <div className="px-4 py-5 font-semibold text-base border-b tracking-tight text-sidebar-foreground">
         LimauAI
       </div>
       <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
-        {NAV.map(({ href, label, icon: Icon }) => {
+        {visibleNav.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href)
           return (
             <Link
