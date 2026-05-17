@@ -32,16 +32,31 @@ webhookRouter.post('/w/:token', async (req, res) => {
   const normalizedPhone = phone.replace(/\D/g, '')
   const { name, car_plate, insurer, amount, quotation_url } = body
 
+  // Parse tags from payload: comma-separated string or JSON array
+  let incomingTags: string[] = []
+  if (body.tags) {
+    if (typeof body.tags === 'string') {
+      incomingTags = body.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+    } else if (Array.isArray(body.tags)) {
+      incomingTags = (body.tags as unknown[]).map(String).filter(Boolean)
+    }
+  }
+
   const { rows: upserted } = await db.query(
-    `INSERT INTO customers (phone, name, car_plate, insurer, source)
-     VALUES ($1,$2,$3,$4,'bot_captured')
+    `INSERT INTO customers (phone, name, car_plate, insurer, tags, source)
+     VALUES ($1, $2, $3, $4, $5::text[], 'bot_captured')
      ON CONFLICT (phone) DO UPDATE SET
        name = COALESCE(EXCLUDED.name, customers.name),
        car_plate = COALESCE(EXCLUDED.car_plate, customers.car_plate),
        insurer = COALESCE(EXCLUDED.insurer, customers.insurer),
+       tags = CASE
+         WHEN cardinality(EXCLUDED.tags) > 0
+         THEN array(SELECT DISTINCT unnest(customers.tags || EXCLUDED.tags))
+         ELSE customers.tags
+       END,
        updated_at = NOW()
      RETURNING id, language, name`,
-    [normalizedPhone, name ?? null, car_plate ?? null, insurer ?? null]
+    [normalizedPhone, name ?? null, car_plate ?? null, insurer ?? null, incomingTags]
   )
   const customer = upserted[0]
 
