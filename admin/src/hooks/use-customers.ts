@@ -28,12 +28,24 @@ export function useCustomers(params?: { search?: string; language?: string; insu
   })
 }
 
+export function useCustomer(id: string | null) {
+  return useQuery<Customer>({
+    queryKey: ['customer', id],
+    queryFn: () => apiFetch(`/admin/customers/${id}`),
+    enabled: id !== null,
+  })
+}
+
 export function useUpdateCustomer(id: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: Partial<Pick<Customer, 'name' | 'car_plate' | 'insurer' | 'renewal_date' | 'tags' | 'custom_fields' | 'status'>>) =>
       apiFetch(`/admin/customers/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['customers'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['customers'] })
+      qc.invalidateQueries({ queryKey: ['customer', id] })
+      qc.invalidateQueries({ queryKey: ['conversations'] })
+    },
   })
 }
 
