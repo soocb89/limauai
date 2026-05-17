@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { requireApiKey } from './middleware/auth.js'
+import { authRouter } from './routes/auth.js'
 import { customersRouter } from './routes/customers.js'
 import { conversationsRouter } from './routes/conversations.js'
 import { kbRouter } from './routes/knowledge-base.js'
@@ -14,6 +15,9 @@ import { webhooksRouter } from './routes/webhooks.js'
 import { waStatusRouter } from './routes/wa-status.js'
 
 export const adminRouter = Router()
+
+// /auth/login is public — mount before requireApiKey
+adminRouter.use('/auth', authRouter)
 
 adminRouter.use(requireApiKey)
 adminRouter.use('/customers', customersRouter)
