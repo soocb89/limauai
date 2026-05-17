@@ -1,26 +1,50 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { jwtVerify } from 'jose'
 
-export function middleware(request: NextRequest) {
+const AGENT_BLOCKED = [
+  '/knowledge-base',
+  '/webhooks',
+  '/broadcast',
+  '/scheduler',
+  '/settings',
+  '/corrections',
+]
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const isLoginPage = pathname === '/login'
-  const isApiAuth = pathname.startsWith('/api/auth')
 
-  // Always allow auth API routes
-  if (isApiAuth) return NextResponse.next()
+  if (pathname.startsWith('/api/auth')) return NextResponse.next()
 
-  const session = request.cookies.get('admin_session')?.value
-  const valid = session === process.env.SESSION_SECRET
+  const token = request.cookies.get('admin_session')?.value
 
-  if (!valid) {
-    if (isLoginPage) return NextResponse.next()
+  if (!token) {
+    if (pathname === '/login') return NextResponse.next()
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Already logged in, don't show login page again
-  if (isLoginPage) return NextResponse.redirect(new URL('/dashboard', request.url))
+  try {
+    const secret = new TextEncoder().encode(process.env.SESSION_SECRET)
+    const { payload } = await jwtVerify(token, secret)
+    const role = (payload.role as string) ?? 'agent'
 
-  return NextResponse.next()
+    if (pathname === '/login') {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    if (role === 'agent' && AGENT_BLOCKED.some(p => pathname.startsWith(p))) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    const res = NextResponse.next()
+    res.headers.set('x-user-role', role)
+    return res
+  } catch {
+    if (pathname === '/login') return NextResponse.next()
+    const res = NextResponse.redirect(new URL('/login', request.url))
+    res.cookies.delete('admin_session')
+    return res
+  }
 }
 
 export const config = {
