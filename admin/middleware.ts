@@ -36,9 +36,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    const res = NextResponse.next()
-    res.headers.set('x-user-role', role)
-    return res
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-user-role', role)
+    return NextResponse.next({ request: { headers: requestHeaders } })
   } catch {
     if (pathname === '/login') return NextResponse.next()
     const res = NextResponse.redirect(new URL('/login', request.url))
