@@ -29,6 +29,7 @@ cd admin && npm run build && cd .. && npx pm2 restart limauai-admin
 # Database
 npm run db:migrate           # Apply SQL migrations (idempotent)
 npm run db:seed              # Insert default bot_config rows
+npm run db:seed-admin        # Seed default admin user (username=admin, password=ADMIN_API_KEY)
 
 # Tests
 npm test                     # Run vitest once
@@ -74,20 +75,25 @@ WA message → language-detector → context-manager (load last 20 msgs) + loadB
 | `handoff-manager` | Escalation triggers: complaint/escalation intent, confidence < threshold, handoff keywords, 3+ consecutive unknowns |
 | `tagger` | Post-conversation auto-tags |
 | `scheduler` | BullMQ workers: renewal queue (T-30/T-14/T-3/T+1), broadcast queue (10 msgs/min limit) |
-| `admin-api` | Express router: customers, conversations, KB, promotions, broadcast, bot-config, corrections, webhook, wa-status |
+| `admin-api` | Express router: auth, customers, conversations, KB, promotions, broadcast, bot-config, corrections, webhook, wa-status |
+| `admin-api/routes/auth.ts` | JWT login (`POST /admin/auth/login` — public), user CRUD (`GET/POST/DELETE /admin/auth/users`, `PATCH /admin/auth/users/:id/password` — all require API key) |
 
 ### Admin Dashboard (`admin/`)
 
 Next.js 14 + React 18 + Tailwind + TanStack Query. Protected by two auth layers:
 1. **Cloudflare Access** (email OTP at CDN edge) — `admin.limauais.my`
-2. **Next.js middleware** (`admin/middleware.ts`) — checks `admin_session` cookie against `SESSION_SECRET` env var
+2. **Next.js middleware** (`admin/middleware.ts`) — verifies `admin_session` JWT cookie using `jose`; blocks agent role from restricted pages; redirects to `/login` on failure
+
+**Role system:** `admin` = full access. `agent` = Conversations + Customers + Promotions (view-only) only. Role stored in JWT, verified in middleware + re-verified directly in `(dashboard)/layout.tsx` via `cookies()` + `jwtVerify`.
 
 Key pages:
-- `/dashboard` — conversations view with inline reply, Open/Handoff/Resolve status toggle, customer name edit
+- `/dashboard` — conversations list + inline reply panel + **CustomerInfoPanel** (pencil icon opens right-side slide-in with editable customer fields: name, car_plate, insurer, renewal_date, tags; read-only: phone, status, language, custom_fields)
 - `/customers` — inline edit for name, car_plate, tags, custom_fields; lead→customer promotion
-- `/knowledge-base` — KB CRUD + document upload + gap analysis
-- `/webhooks` — webhook builder with custom fields + `{{field}}` message templates
-- `/settings` — bot config including `custom_instructions` appended to every system prompt
+- `/knowledge-base` — KB CRUD + document upload + gap analysis *(admin only)*
+- `/promotions` — promotions list; write actions hidden for agent role
+- `/webhooks` — webhook builder with custom fields + `{{field}}` message templates *(admin only)*
+- `/settings` — bot config including `custom_instructions` appended to every system prompt *(admin only)*
+- `/users` — admin user management: list all users, create (username/password/role), reset password, delete *(admin only)*
 
 ### Conversation Status Flow
 
@@ -107,13 +113,15 @@ Admin can toggle: **Pause AI (Handoff)** / **Resume AI** / **Resolve** buttons i
 
 ### Key DB Tables
 
-`customers` (with `tags TEXT[]`, `custom_fields JSONB`, `status VARCHAR` lead/customer), `conversations` (status: open/handoff/resolved), `messages`, `knowledge_base` (pgvector 1536-dim), `bot_corrections`, `promotions`, `quotations`, `payments`, `follow_up_jobs`, `bot_config` (key-value: tone, persona_name, model, owner_phone, handoff_threshold, max_unknowns, custom_instructions), `webhooks` (token, fields JSONB, message_template)
+`customers` (with `tags TEXT[]`, `custom_fields JSONB`, `status VARCHAR` lead/customer), `conversations` (status: open/handoff/resolved), `messages`, `knowledge_base` (pgvector 1536-dim), `bot_corrections`, `promotions`, `quotations`, `payments`, `follow_up_jobs`, `bot_config` (key-value: tone, persona_name, model, owner_phone, handoff_threshold, max_unknowns, custom_instructions), `webhooks` (token, fields JSONB, message_template), `admin_users` (id UUID, username, password_hash bcrypt, role admin/agent, created_at)
 
 ### Environment Variables
 
-Backend `.env` — required: `DATABASE_URL`, `REDIS_URL`, `OPENAI_API_KEY`, `ADMIN_API_KEY`, `OWNER_PHONE`, `BAILEYS_SESSION_PATH`, `PORT`
+Backend `.env` — required: `DATABASE_URL`, `REDIS_URL`, `OPENAI_API_KEY`, `ADMIN_API_KEY`, `OWNER_PHONE`, `BAILEYS_SESSION_PATH`, `PORT`, `SESSION_SECRET`
 
 Admin `admin/.env.local` — required: `BACKEND_URL`, `ADMIN_API_KEY`, `SESSION_SECRET`
+
+> `SESSION_SECRET` must be identical in both files — backend signs JWTs with it, admin middleware verifies them.
 
 ### WA Connector — LID Resolution
 
@@ -123,9 +131,34 @@ WhatsApp multi-device sends messages with `@lid` JIDs. On startup, `startWAConne
 
 - Accepts query params OR JSON body (merged: `{...req.query, ...req.body}`)
 - Upserts customer (phone, name, car_plate, insurer)
+- Merges `tags` field into `customer.tags` — accepts comma-separated string (`"vip,renewal"`) or JSON array; uses `array(SELECT DISTINCT unnest(...))` to deduplicate without overwriting existing tags
 - Renders `{{field}}` template from webhook `message_template`
 - Sends WA message via `sendText()`
 - Saves sent message to conversation history (role: 'bot')
+
+### Auth Flow
+
+1. User POSTs `{username, password}` to `/api/auth/login` (Next.js route)
+2. Next.js route forwards to `POST /admin/auth/login` (backend, public — mounted before `requireApiKey`)
+3. Backend verifies bcrypt hash, signs JWT `{sub, role}` with `SESSION_SECRET` (7d expiry), returns `{token, role}`
+4. Next.js stores JWT in `admin_session` httpOnly cookie
+5. Middleware (`admin/middleware.ts`) verifies JWT on every request, blocks agent from restricted paths
+6. `(dashboard)/layout.tsx` re-verifies JWT from cookie directly to set `RoleProvider` context for client components
+
+### Creating Admin Users
+
+```bash
+# Seed default admin (uses ADMIN_API_KEY as password)
+npm run db:seed-admin
+
+# Create agent via API
+curl -X POST http://localhost:3001/admin/auth/users \
+  -H "X-Api-Key: <ADMIN_API_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"agent1","password":"pass","role":"agent"}'
+
+# Or use the /users page in the admin dashboard (admin role required)
+```
 
 ### TypeScript Config
 
