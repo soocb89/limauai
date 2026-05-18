@@ -17,6 +17,7 @@ import {
   LogOut,
   Sun,
   Moon,
+  UserCog,
 } from 'lucide-react'
 
 const NAV = [
@@ -28,6 +29,7 @@ const NAV = [
   { href: '/scheduler', label: 'Scheduler', icon: Clock, adminOnly: true },
   { href: '/webhooks', label: 'Webhooks', icon: Webhook, adminOnly: true },
   { href: '/settings', label: 'Settings', icon: Settings, adminOnly: true },
+  { href: '/users', label: 'Users', icon: UserCog, adminOnly: true },
 ]
 
 function ThemeToggle() {

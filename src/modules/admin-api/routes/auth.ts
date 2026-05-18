@@ -46,3 +46,26 @@ authRouter.post('/users', requireApiKey, async (req, res) => {
   )
   res.json(rows[0])
 })
+
+// List all admin users
+authRouter.get('/users', requireApiKey, async (req, res) => {
+  const { rows } = await db.query(
+    'SELECT id, username, role, created_at FROM admin_users ORDER BY created_at ASC'
+  )
+  res.json(rows)
+})
+
+// Delete a user
+authRouter.delete('/users/:id', requireApiKey, async (req, res) => {
+  await db.query('DELETE FROM admin_users WHERE id = $1', [req.params.id])
+  res.json({ ok: true })
+})
+
+// Reset password
+authRouter.patch('/users/:id/password', requireApiKey, async (req, res) => {
+  const { password } = req.body
+  if (!password) return res.status(400).json({ error: 'password required' })
+  const hash = await bcrypt.hash(password, 10)
+  await db.query('UPDATE admin_users SET password_hash = $1 WHERE id = $2', [hash, req.params.id])
+  res.json({ ok: true })
+})
