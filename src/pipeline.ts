@@ -120,8 +120,40 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
   const intentResult = await classifyIntent(text, context.messages)
   const threshold = parseFloat(botConfig.handoff_threshold ?? '0.6')
 
+  // Always retrieve KB first so complaint/crash intents can still provide relevant info
+  const [kbChunks, corrections] = await Promise.all([
+    retrieveKB(text),
+    loadCorrections(intentResult.intent),
+  ])
+
   if (shouldHandoff(intentResult, context.consecutiveUnknowns, threshold)) {
     const { rows: customerRows } = await db.query('SELECT name FROM customers WHERE id = $1', [customer.id])
+
+    // If KB has relevant info, send it before handing off
+    if (kbChunks.length > 0) {
+      const kbReply = await generateReply({
+        userMessage: text,
+        language,
+        intent: intentResult.intent,
+        context: context.messages,
+        kbChunks,
+        corrections,
+        botConfig: {
+          tone: botConfig.tone ?? 'friendly',
+          persona_name: botConfig.persona_name ?? 'Aina',
+          language_fallback: botConfig.language_fallback ?? 'bm',
+          custom_instructions: (botConfig.custom_instructions ?? '') +
+            '\n\nIMPORTANT: After providing the helpful information above, end with a brief note that a human agent will follow up shortly.',
+        },
+        useGpt4: true,
+      })
+      await sendText(phone, kbReply)
+      await saveMessage({
+        conversationId: context.conversationId, role: 'bot', content: kbReply,
+        intent: intentResult.intent, language, confidence: intentResult.confidence,
+      })
+    }
+
     await triggerHandoff({
       phone, customerId: customer.id, conversationId: context.conversationId,
       customerName: customerRows[0]?.name ?? null, intent: intentResult.intent, language, lastMessage: text,
@@ -132,11 +164,6 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
     })
     return
   }
-
-  const [kbChunks, corrections] = await Promise.all([
-    retrieveKB(text),
-    loadCorrections(intentResult.intent),
-  ])
 
   const reply = await generateReply({
     userMessage: text,
