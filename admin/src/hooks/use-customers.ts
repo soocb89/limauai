@@ -13,6 +13,8 @@ export interface Customer {
   source: string
   tags: string[]
   custom_fields: Record<string, string>
+  last_intent: string | null
+  intent_confidence: number | null
 }
 
 export function useCustomers(params?: { search?: string; language?: string; insurer?: string; page?: number }) {

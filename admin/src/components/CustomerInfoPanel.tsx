@@ -84,6 +84,22 @@ export function CustomerInfoPanel({ customerId, onClose }: Props) {
             <Input id="panel-tags" value={tagsInput} onChange={e => setTagsInput(e.target.value)} className="h-8 text-sm" placeholder="vip, renewal, follow-up" />
           </div>
 
+          {customer.last_intent && (
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Detected Intent</Label>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary capitalize">
+                  {customer.last_intent.replace(/_/g, ' ')}
+                </span>
+                {customer.intent_confidence != null && (
+                  <span className="text-xs text-muted-foreground">
+                    {Math.round(customer.intent_confidence * 100)}% confidence
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Status</Label>
             <p className="text-sm capitalize">{customer.status}</p>

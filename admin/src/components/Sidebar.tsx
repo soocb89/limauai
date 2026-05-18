@@ -18,11 +18,14 @@ import {
   Sun,
   Moon,
   UserCog,
+  BarChart2,
+  BrainCircuit,
 } from 'lucide-react'
 
 const NAV = [
   { href: '/dashboard', label: 'Conversations', icon: MessageSquare, adminOnly: false },
   { href: '/customers', label: 'Customers', icon: Users, adminOnly: false },
+  { href: '/analytics', label: 'Analytics', icon: BarChart2, adminOnly: false },
   { href: '/knowledge-base', label: 'Knowledge Base', icon: BookOpen, adminOnly: true },
   { href: '/promotions', label: 'Promotions', icon: Megaphone, adminOnly: false },
   { href: '/broadcast', label: 'Broadcast', icon: Zap, adminOnly: true },
@@ -30,6 +33,7 @@ const NAV = [
   { href: '/webhooks', label: 'Webhooks', icon: Webhook, adminOnly: true },
   { href: '/settings', label: 'Settings', icon: Settings, adminOnly: true },
   { href: '/users', label: 'Users', icon: UserCog, adminOnly: true },
+  { href: '/ai-advisor', label: 'AI Advisor', icon: BrainCircuit, adminOnly: true },
 ]
 
 function ThemeToggle() {

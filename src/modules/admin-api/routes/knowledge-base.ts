@@ -69,14 +69,18 @@ kbRouter.post('/upload', upload.single('file'), async (req, res) => {
 
 kbRouter.get('/gaps', async (_req, res) => {
   const { rows } = await db.query(`
-    SELECT intent,
-           AVG(confidence) AS avg_confidence,
-           COUNT(*) AS count
-    FROM messages
-    WHERE role = 'user'
-      AND intent IS NOT NULL
-      AND confidence < 0.6
-    GROUP BY intent
+    SELECT m.intent,
+           AVG(m.confidence) AS avg_confidence,
+           COUNT(DISTINCT c.id) AS handoff_count
+    FROM messages m
+    JOIN conversations c ON m.conversation_id = c.id
+    WHERE m.role = 'user'
+      AND m.intent IS NOT NULL
+      AND m.intent NOT IN ('complaint', 'escalation')
+      AND m.confidence < 0.6
+      AND c.status = 'handoff'
+    GROUP BY m.intent
+    HAVING COUNT(DISTINCT c.id) >= 5
     ORDER BY avg_confidence ASC
     LIMIT 20
   `)

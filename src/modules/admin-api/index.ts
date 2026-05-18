@@ -13,6 +13,8 @@ import { webhookRouter } from './routes/webhook.js'
 import { testRouter } from './routes/test.js'
 import { webhooksRouter } from './routes/webhooks.js'
 import { waStatusRouter } from './routes/wa-status.js'
+import { analyticsRouter } from './routes/analytics.js'
+import { aiAdvisorRouter } from './routes/ai-advisor.js'
 
 export const adminRouter = Router()
 
@@ -31,5 +33,7 @@ adminRouter.use('/corrections', correctionsRouter)
 adminRouter.use('/test', testRouter)
 adminRouter.use('/webhooks', webhooksRouter)
 adminRouter.use('/wa', waStatusRouter)
+adminRouter.use('/analytics', analyticsRouter)
+adminRouter.use('/ai-advisor', aiAdvisorRouter)
 
 export const webhookRouter_ = webhookRouter

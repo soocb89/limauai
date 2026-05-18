@@ -47,7 +47,16 @@ customersRouter.get('/', async (req, res) => {
 customersRouter.get('/:id', async (req, res) => {
   const { rows } = await db.query('SELECT * FROM customers WHERE id = $1', [req.params.id])
   if (!rows[0]) return res.status(404).json({ error: 'Not found' })
-  res.json(rows[0])
+
+  const { rows: intentRows } = await db.query(
+    `SELECT m.intent, m.confidence
+     FROM messages m
+     JOIN conversations c ON m.conversation_id = c.id
+     WHERE c.customer_id = $1 AND m.role = 'user' AND m.intent IS NOT NULL
+     ORDER BY m.created_at DESC LIMIT 1`,
+    [req.params.id]
+  )
+  res.json({ ...rows[0], last_intent: intentRows[0]?.intent ?? null, intent_confidence: intentRows[0]?.confidence ?? null })
 })
 
 customersRouter.post('/', async (req, res) => {

@@ -9,6 +9,8 @@ const AGENT_BLOCKED = [
   '/scheduler',
   '/settings',
   '/corrections',
+  '/users',
+  '/ai-advisor',
 ]
 
 export async function middleware(request: NextRequest) {
