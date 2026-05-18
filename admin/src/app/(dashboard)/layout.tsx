@@ -1,9 +1,19 @@
-import { headers } from 'next/headers'
+import { cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
 import { Sidebar } from '@/components/Sidebar'
 import { RoleProvider } from '@/components/RoleProvider'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const role = (headers().get('x-user-role') ?? 'agent') as 'admin' | 'agent'
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  let role: 'admin' | 'agent' = 'agent'
+  try {
+    const token = cookies().get('admin_session')?.value
+    if (token) {
+      const secret = new TextEncoder().encode(process.env.SESSION_SECRET)
+      const { payload } = await jwtVerify(token, secret)
+      role = ((payload.role as string) === 'admin' ? 'admin' : 'agent')
+    }
+  } catch {}
+
   return (
     <RoleProvider role={role}>
       <div className="flex h-[100dvh] overflow-hidden">
