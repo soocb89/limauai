@@ -28,14 +28,23 @@ export async function addKBEntry(params: {
   content: string
   category?: string
 }): Promise<string> {
+  return addKBEntryWithSource({ ...params, source_document: null })
+}
+
+export async function addKBEntryWithSource(params: {
+  title: string
+  content: string
+  category?: string
+  source_document: string | null
+}): Promise<string> {
   const embedding = await embedText(`${params.title}\n${params.content}`)
   const embeddingLiteral = `[${embedding.join(',')}]`
 
   const { rows } = await db.query(
-    `INSERT INTO knowledge_base (title, content, embedding, category)
-     VALUES ($1, $2, $3::vector, $4)
+    `INSERT INTO knowledge_base (title, content, embedding, category, source_document)
+     VALUES ($1, $2, $3::vector, $4, $5)
      RETURNING id`,
-    [params.title, params.content, embeddingLiteral, params.category ?? null]
+    [params.title, params.content, embeddingLiteral, params.category ?? null, params.source_document]
   )
   return rows[0].id
 }

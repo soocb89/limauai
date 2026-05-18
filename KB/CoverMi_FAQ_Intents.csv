@@ -1,0 +1,100 @@
+﻿source,item_id,category_id,category,intent,customer_utterances,agent_response,answer_variants,status,notes
+CoverMi FAQ.docx,FAQ-001,road_tax,Road tax & JPJ,faq_renew_car_insurance_and_road_tax_covermi,How do I renew my car insurance and road tax with CoverMi?,"Simply visit our homepage, select your vehicle, and click ""Get Quote."" You'll be asked to enter a few basic details such as your vehicle registration number, MyKad (NRIC) or Passport number, and E-mail address. We'll then instantly display competitive quotes from trusted insurance providers, allowing you to compare coverage options and features side by side before choosing the one that best fits your needs.",,ready,
+CoverMi FAQ.docx,FAQ-002,road_tax,Road tax & JPJ,faq_renew_road_tax_without_insurance,Can I renew my road tax without insurance?,The answer is No. JPJ requires you to have valid motor (as in vehicle) insurance before you can renew your road tax. CoverMi makes this easy by bundling both into one smooth process.,,ready,
+CoverMi FAQ.docx,FAQ-003,support,"Support, complaints & account help",faq_renew_insurance_has_already_expired,Can I renew if my insurance has already expired?,"No, the renewal process becomes more complicated once your insurance has expired, especially if it has lapsed for a long period. You'll need to return to your previous insurance provider to renew it. For example, if your previous insurer was Allianz, you must go back to Allianz. If you wish to switch to another insurance company afterward, you'll still need to follow this process: renew with your previous insurer first, cancel it, and then purchase a new policy with your preferred provider, such as CoverMi.",,ready,
+CoverMi FAQ.docx,FAQ-004,renew_quote,Renewal & quotation,faq_which_insurance_providers_covermi_work,Which insurance providers does CoverMi work with?,"We partner with Malaysia's leading insurance providers to offer you comprehensive coverage options, including:
+Takaful Ikhlas General Berhad
+Syarikat Takaful Malaysia Am Berhad
+Allianz General Insurance Berhad
+Zurich General Takaful Malaysia Berhad
+And more insurance partners are coming soon.",,ready,
+CoverMi FAQ.docx,FAQ-005,road_tax,Road tax & JPJ,faq_vehicles_insure_through_covermi,What vehicles can I insure through CoverMi?,"Our services cover:
+- Private cars
+- Motorcycles
+Note: For e-hailing vehicles, we currently offer insurance renewal only, without road tax renewal services.",,ready,
+CoverMi FAQ.docx,FAQ-006,payment,Payment & transaction,faq_benefits_renewing_covermi,What are the benefits of renewing with CoverMi?,"- Competitive Rates from Multiple Insurers
+- Hassle-Free Documentation
+- 24/7 Customer Support
+- Instant Policy Issuance
+- Secure Payment Options
+- Authorized Provider",,ready,
+CoverMi FAQ.docx,FAQ-007,road_tax,Road tax & JPJ,faq_don_t_remember_insurance_and_road_tax,What if I don't remember my insurance and road tax expiry dates?,"We will send automatic reminders via:
+- Email notifications
+- WhatsApp messages
+- SMS alerts
+You'll receive notifications ahead of your renewal dates to ensure continuous coverage, so you'll never have to worry about missing an expiry again",,ready,
+CoverMi FAQ.docx,FAQ-008,payment,Payment & transaction,faq_payment_methods_available,What payment methods are available?,"For now, we only accept online banking (FPX) and digital wallets. All payments are processed securely through our encrypted payment gateway.",,ready,
+CoverMi FAQ.docx,FAQ-009,payment,Payment & transaction,faq_offer_instalment_payments_bnpl,Do you offer instalment payments (BNPL)?,"Yes. This features is coming soon.
+We partner with selected Buy Now Pay Later providers such as Atome and PayLater by Grab so you can split your payments into affordable installments. BNPL is also known as Cover Now, Pay Later (CNPL) with CoverMi.",,ready,
+CoverMi FAQ.docx,FAQ-010,payment,Payment & transaction,faq_payment_secure,Is my payment secure?,"Absolutely. All transactions on CoverMi are encrypted and processed through compliant payment gateways, ensuring your information is fully protected.",,ready,
+CoverMi FAQ.docx,FAQ-011,payment,Payment & transaction,faq_get_insurance_documents,How do I get my insurance documents?,"After successful payment, your insurance documents (both e-Cover Note and e-Policy) will be automatically sent to your registered email address.",,ready,
+CoverMi FAQ.docx,FAQ-012,road_tax,Road tax & JPJ,faq_receive_road_tax_sticker,Will I receive my road tax sticker?,"No, physical road tax stickers are no longer mandatory. To support sustainability and reduce waste. We provides digital road tax only.",,ready,
+CoverMi FAQ.docx,FAQ-013,claims,Claims & roadside assistance,faq_make_insurance_takaful_claim,How do I make an insurance/takaful claim?,"In the event of an accident or damage, follow these steps:
+1. Document the incident: Take clear photos and note down relevant details.
+2. File a police report within 24 hours (if applicable).
+3. Contact your insurance provider directly to initiate the claim process.
+Insurer Contact Numbers:
+Takaful Ikhlas: 1-800-88-1186
+Takaful Malaysia: 1-800-888-788
+Allianz: 1-800-22-5542
+Zurich Takaful: 1-300-88-622
+If you're unsure which insurer your policy is under, you may contact us at +603-9212 8311 and we'll help guide you to the right provider.",,ready,
+CoverMi FAQ.docx,FAQ-014,claims,Claims & roadside assistance,faq_long_it_take_claim_processed,How long does it take for a claim to be processed?,"Processing time depends on the insurer and the nature of the claim. Minor claims may take a few working days, while accident repairs may take 2-6 weeks depending on workshop availability and parts.",,ready,
+CoverMi FAQ.docx,FAQ-015,claims,Claims & roadside assistance,faq_should_car_breaks_down_or_need_roadside,What should I do if my car breaks down or I need a Roadside Assistance?,"Have no worries, boss  I hope you're safe.
+If your policy includes roadside assistance car broke down, tyre puncture, or you're stuck and need towing, please contact your insurer's roadside hotline:
+1. Takaful Ikhlas: 1-800-88-1186
+2. Syarikat Takaful Malaysia: 1-800-88-8788
+3. Zurich Takaful: 1-300-88-5566
+4. Allianz: 1-800-22-5542
+5. Chubb: 1-300-88-0128
+6. Tokio Marine: 1-300-22-1188;
+If unsure which insurer you're with, tell me the name and I'll help check it",,ready,
+CoverMi FAQ.docx,FAQ-016,road_tax,Road tax & JPJ,faq_renew_road_tax_have_outstanding_summons,Can I renew my road tax if I have outstanding summons?,"During the renewal process, our system automatically checks for any outstanding summons with JPJ and PDRM. To proceed with the renewal, all outstanding traffic summons must be settled first.",,ready,
+CoverMi FAQ.docx,FAQ-017,support,"Support, complaints & account help",faq_contact_covermi_customer_support,How can I contact CoverMi Customer Support?,"May I know any issue you encountered? I will be here to assist you. Alternatively, you may contact us at the following channel:
+Phone: +603-9212 8311
+E-mail: cs.support@covermi.my
+Our Operating hours: Monday - Friday, 11.00 AM - 8.00PM. Excluding public holidays.",,ready,
+CoverMi FAQ.docx,FAQ-018,support,"Support, complaints & account help",faq_covermi_s_online_services_available_24_7,Are CoverMi's online services available 24/7?,"Yes, our online platform is available 24/7, allowing you to get quotes, renew policies, and access support services at any time, including weekends and public holidays.",,ready,
+CoverMi FAQ.docx,FAQ-019,support,"Support, complaints & account help",faq_file_complaint_answers_may_understand_happened_let,How do I file a complaint?,May I understand what happened? Let me help you on this.,,ready,
+CoverMi FAQ.docx,FAQ-020,documents,Policy documents,faq_covermi_s_refund_policy,What is CoverMi's refund policy?,"To request refund, below are the condition and process:
+1. Refund requests must be made within 24 hours of policy purchase
+2. Requests will be processed within 1-2 working days
+3. For policies where e-Cover notes have been issued, refund requests must be made directly to the respective insurance provider.",,ready,
+CoverMi FAQ.docx,FAQ-021,documents,Policy documents,faq_cancel_policy_anytime,Can I cancel my policy anytime?,"Yes, you may cancel your policy after purchase; however, refunds are subject to the insurer's cancellation terms. Policies with an active e-Cover Note typically require you to request cancellation directly from the insurer. While CoverMi cannot process cancellations on your behalf, we can guide you to the right contact for assistance.",,ready,
+CoverMi FAQ.docx,FAQ-022,support,"Support, complaints & account help",faq_made_mistake_in_policy_details,What if I made a mistake in my policy details?,"May I know what info need to be correct? Any minor details (such as email, phone number, address) can often be corrected quickly.
+For major details (such as car plate number, vehicle info), adjustments may require insurer approval.",,ready,
+CoverMi FAQ.docx,FAQ-023,payment,Payment & transaction,faq_why_payment_rejected,Why is my payment rejected?,"May I know what error messages show up? So I can check further from our end.
+Below are the common reasons if payment is rejected:
+Credit card verification issues
+System interruptions
+Bank processing errors",,ready,"Intent is to diagnose the customer's specific payment error. Ask for the exact error message or code, then check it against payment or response-code knowledge before replying."
+CoverMi FAQ.docx,FAQ-024,renew_quote,Renewal & quotation,faq_get_best_car_insurance,How do I get the best car insurance?,"We help you find the best insurance by:
+Comparing quotes from multiple insurers
+Showing transparent coverage details and premiums
+Offering customization options to match your needs
+Providing expert advice through our customer service team",,ready,
+CoverMi FAQ.docx,FAQ-025,claims,Claims & roadside assistance,faq_offer_no_claim_discount_ncd,Do you offer No Claim Discount (NCD)?,"Yes. We honour the NCD system. You'll automatically receive a discount on your premium if you haven't made any claims during your previous policy period. The NCD percentage increases with each claim-free year, up to 55%.",,ready,
+CoverMi FAQ.docx,FAQ-026,coverage,"Coverage, NCD & add-ons",faq_transfer_ncd_from_another_insurer,How do I transfer my NCD from another insurer?,"In most cases, you don't need to transfer your NCD manually.
+If you're renewing because your policy is due to expire, you can compare and purchase through CoverMi in advance. Your new policy will start on the same date your existing policy ends, and your NCD will be transferred and confirmed automatically.
+Manual NCD transfer is only required if you choose to terminate your policy early and switch insurers. Otherwise, no action is needed from you.",,ready,
+CoverMi FAQ.docx,FAQ-027,claims,Claims & roadside assistance,faq_protect_ncd,Can I protect my NCD?,"Yes, some insurers offer an NCD Protector add-on. This feature allows you to make one claim per year without losing your NCD entitlement. You can choose to include it as an optional add-on when selecting your coverage.",,ready,
+CoverMi FAQ.docx,FAQ-028,support,"Support, complaints & account help",faq_adjust_sum_insured,Can I adjust my sum insured?,"Yes. You can adjust your sum insured within a reasonable range based on your vehicle's current market value by clicking ""Edit"" at the Policy Info after you selected your preferred insurance provider.
+If your policy is already active, the adjustment will require an endorsement (an official amendment to your policy). In some cases, you may need to cancel the existing policy and purchase a new one.",,ready,
+CoverMi FAQ.docx,FAQ-029,trust,"Trust, compliance & brand",faq_covermi_licensed_by_bank_negara_malaysia,Is CoverMi licensed by Bank Negara Malaysia?,"CoverMi operates in partnership with M Advisory, and works exclusively with insurers and Takaful operators licensed and regulated by Bank Negara Malaysia, through PIAM (Persatuan Insurans Am Malaysia), for general insurers and MTA (Malaysian Takaful Association) for Takaful providers. This ensures that all policies purchased through CoverMi are valid, legal, and fully recognised by the authorities.",,ready,
+CoverMi FAQ.docx,FAQ-030,documents,Policy documents,faq_policies_bought_covermi_recognized_by_jpj,Are policies bought on CoverMi recognized by JPJ?,"Yes. All policies issued via CoverMi are valid and recognized by JPJ, and the e-Cover note generated is accepted for road tax renewal.",,ready,
+CoverMi FAQ.docx,FAQ-031,road_tax,Road tax & JPJ,faq_renew_behalf_someone_else,Can I renew on behalf of someone else?,"Yes. If you have the required details (vehicle number, NRIC/Passport, and postcode), you can renew insurance and road tax for family members, friends, or company vehicles.",,ready,
+CoverMi FAQ.docx,FAQ-032,payment,Payment & transaction,faq_receive_receipt_payment,Will I receive a receipt for my payment?,"Yes, you'll receive an e-Receipt via email for every successful transaction. Please keep this for your records.",,ready,
+CoverMi FAQ.docx,FAQ-033,payment,Payment & transaction,faq_know_transaction_was_successful,How do I know if my transaction was successful?,"You'll know your transaction was successful if:
+- You receive an immediate confirmation email
+- An e-Services receipt is issued
+- For insurance policies, you'll receive an e-Cover note and e-Policy",,ready,
+CoverMi FAQ.docx,FAQ-034,renew_quote,Renewal & quotation,faq_would_foreigner_need_pay_more_while_renew,Would foreigner need to pay more while renew with CoverMi?,Foreigner who owns a car in Malaysia will not need to pay extra. The premium might be different based on add on and other factors subject to the insurer's review.,,ready,
+CoverMi FAQ.docx,FAQ-035,trust,"Trust, compliance & brand",faq_why_didn_t_hear_before,Why I didn't hear you before?,Use one of the approved answer variants below. Do not send all variants together. Choose the version that best matches the tone of the conversation.,"CoverMi has been in the market since 2024. We began on a smaller scale and have been expanding gradually, so more customers are only starting to hear about us as we grow.
+---
+CoverMi was founded in 2024. We spent our early period strengthening partnerships with insurers and improving our digital platform, which is why our brand exposure has increased more recently.
+---
+CoverMi started in 2024. We focused more on building the service and working with trusted insurance partners first, so you may be hearing about us more now rather than earlier.",ready,"Original FAQ contains three alternative approved answers; chatbot should select one, not concatenate them."
+CoverMi FAQ.docx,FAQ-036,claims,Claims & roadside assistance,faq_select_no_e_hailing_even_drive_e,Can I select No for E-hailing even I drive for E-hailing use?,"E-hailing insurance is compulsory because driving for Grab, Bolt, AirAsia Ride, or Maxim is considered commercial use. Private insurance only covers personal driving. E-hailing coverage makes sure your claims are valid if anything happens while you're working.",,ready,
+CoverMi FAQ.docx,FAQ-037,coverage,"Coverage, NCD & add-ons",faq_s_difference_agreed_value_and_market_value,What's the difference of Agreed Value and Market Value?,"Market Value means your car is insured for its current market value at the time of renewal. This value changes over time.
+Agreed Value means you and the insurer agree on a fixed sum insured for your car, which remains constant throughout the policy period.
+Let me summarize for you. If your car being stolen or totalled, Agreed Value gives you a fixed payout amount, while Market Value gives you a payout amount depends on your car's worth at the time of the incident.",,ready,

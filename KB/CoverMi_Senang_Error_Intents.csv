@@ -1,0 +1,61 @@
+﻿source,item_id,code,category_id,category,intent,customer_utterances,agent_response,agent_action,status,notes
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG001,SNG001,renewal_status,Renewal status,error_senang_sng001,I got error SNG001; Your vehicle has already been renewed. Please check with Insurance Provider or contact the customer service team for a personalised quote.,"Vehicle already renewed.
+Your vehicle has already been renewed. Please contact your insurance provider if you need help.
+[{senang code}]",Explain that the vehicle appears already renewed and guide the customer to their insurer or support.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG002,SNG002,renewal_timing,Renewal timing,error_senang_sng002,I got error SNG002; Your policy isn't expiring soon (expiry date),"Too early to renew.
+Your policy is not expiring soon. Please check back as early as 60 days before expiry date.
+[{senang code}]",Tell the customer renewal is too early and ask them to return within the renewal window.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG003,SNG003,identity_vehicle_validation,Identity / vehicle validation,error_senang_sng003,I got error SNG003; The combination of NRIC and Vehicle Number is not correct,"ID and vehicle mismatch.
+Your ID number and vehicle number don't match. Please check your details and try again.
+[{senang code}]","Ask the customer to verify NRIC or passport number and vehicle registration, then retry.",ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG004,SNG004,temporary_system_error,Temporary system issue,error_senang_sng004,"I got error SNG004; We're sorry, we can't process your request online at the moment.","Oops! Something went wrong.
+Please try again in 5 minutes. If the issue persists, contact us on CoverMi WhatsApp at 013-435 9113.
+[{senang code}]",Ask the customer to retry after 5 minutes; escalate to CoverMi WhatsApp if it persists.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG005,SNG005,vehicle_eligibility,Vehicle eligibility,error_senang_sng005,I got error SNG005; Your vehicle has exceeded the renewal age limit.,"Vehicle exceeds renewal age.
+We're unable to process the request. Your vehicle has exceeded the renewal age limit. [{senang code}]",Explain that the vehicle is outside online renewal eligibility.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG006,SNG006,vehicle_lookup,Vehicle lookup,error_senang_sng006,I got error SNG006; You cannot purchase insurance online as the age range of the vehicle owner and the vehicle is not available in the system.,"Vehicle not found.
+We couldn't find any matching vehicle details. Please check your details and try again.
+[{senang code}]",Ask the customer to check vehicle details and retry.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG007,SNG007,identity_vehicle_validation,Identity / vehicle validation,error_senang_sng007,"I got error SNG007; The values entered does not match with JPJ Data. Please ensure that the ID Number and Vehicle Number are the same. Alternatively, please contact the customer service team for a personalised quote.","ID and vehicle mismatch.
+The ID number and vehicle number don't match. Please check your details and try again.
+[{senang code}]","Ask the customer to verify NRIC or passport number and vehicle registration, then retry.",ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG007E,SNG007E,temporary_system_error,Temporary system issue,error_senang_sng007e,I got error SNG007E; Your vehicle is pending confirmation for JPJ approval. Please contact the customer service team to find out the status of approval.,"Oops! Something went wrong.
+Please try again in 5 minutes. If the issue persists, contact us on CoverMi WhatsApp at 013-435 9113.
+[{senang code}]",Ask the customer to retry after 5 minutes; escalate to CoverMi WhatsApp if it persists.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG008,SNG008,vehicle_lookup,Vehicle lookup,error_senang_sng008,I got error SNG008; Your vehicle is not available for online quotation. Please contact customer service team for a personalised quote.,"Vehicle not found.
+We couldn't find any matching vehicle details. Please check your details and try again.
+[{senang code}]",Ask the customer to check vehicle details and retry.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG009,SNG009,general_error,General error,error_senang_sng009,I got error SNG009; The takaful contribution quotation will be different as the quote validity has expired. Please contact customer service team if you have further questions.,"Quote expired.
+Please request a new quotation to continue.
+[{senang code}]",Use the approved message and escalate if the customer cannot proceed.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG010,SNG010,temporary_system_error,Temporary system issue,error_senang_sng010,I got error SNG010; The system is currently down. Please contact customer service team for a personalised quote.,"Oops! Something went wrong.
+Please try again in 5 minutes. If the issue persists, contact us on CoverMi WhatsApp at 013-435 9113.
+[{senang code}]",Ask the customer to retry after 5 minutes; escalate to CoverMi WhatsApp if it persists.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG011,SNG011,general_error,General error,error_senang_sng011,I got error SNG011; Unable to issue the insurance policy because the vehicle is currently blacklisted or the cover note has been canceled. Please contact customer service team for a personalised quote.-,"Policy couldn't be issued.
+The vehicle is blacklisted or the cover note has been canceled. Contact us on CoverMi WhatsApp at 013-435 9113 for assistance.
+[{senang code}]",Use the approved message and escalate if the customer cannot proceed.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG013,SNG013,general_error,General error,error_senang_sng013,I got error SNG013; Your payment is successful.,"Payment successful.
+[{senang code}]",Use the approved message and escalate if the customer cannot proceed.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG014,SNG014,temporary_system_error,Temporary system issue,error_senang_sng014,I got error SNG014; System is currently processing your request. Please be patient and do not refresh the page.,"Processing your request.
+This may take a moment. Please don't close or refresh this page.
+[{senang code}]",Ask the customer to retry after 5 minutes; escalate to CoverMi WhatsApp if it persists.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG015,SNG015,general_error,General error,error_senang_sng015,"I got error SNG015; Your payment is successful, but we are unable to generate invoice no. SNGV10. Please contact customer service team for a personalised quote.","Payment successful.
+[{senang code}]",Use the approved message and escalate if the customer cannot proceed.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG016,SNG016,general_error,General error,error_senang_sng016,I got error SNG016; Cover type is not supported.,"Cover type not supported.
+This cover type isn't supported. Please check your details and try again.
+[{senang code}]",Use the approved message and escalate if the customer cannot proceed.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG017,SNG017,manual_approval_required,Manual approval required,error_senang_sng017,I got error SNG017; Prior approval is required for this vehicle model.,Do not show this as a customer-facing chatbot response. This code is out of scope for the customer journey and is not expected to appear on the customer side. Route internally if it appears.,Escalate to CoverMi support because manual insurer approval is required.,internal_only_do_not_publish,"Should be out of scope.
+
+Due to manual request from Senang required and it will not created in CoverMi back office."
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG019,SNG019,sum_insured,Sum insured,error_senang_sng019,I got error SNG019; The value of sum insured is out of range.,"Sum insured out of range.
+Please adjust the sum insured and try again.
+[{senang code}]",Ask the customer to adjust the sum insured within the allowed range.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNG020,SNG020,duplicate_transaction,Duplicate transaction,error_senang_sng020,I got error SNG020; Duplicate transaction,"Duplicate transaction.
+Please check your policy status or contact us on CoverMi WhatsApp at 013-435 9113 for assistance.
+[{senang code}]",Ask the customer to check policy or transaction status before trying again.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNGV01,SNGV01,missing_or_invalid_input,Missing or invalid input,error_senang_sngv01,I got error SNGV01; The values of the required field is empty.,"Incomplete info.
+Some details are missing or incomplete. Please check your details and try again.
+[{senang code}]",Ask the customer to complete missing fields and follow the required format.,ready,Ok to proceed
+CoverMi system error code_senang_v2-designer_edit.xlsx / senang_code,ERR-SENANG-SNGV02,SNGV02,missing_or_invalid_input,Missing or invalid input,error_senang_sngv02,"I got error SNGV02; The required field is incomplete. Please follow the sample format to get a quotation, or contact customer service team for a personalised quote.","Incomplete info.
+Some details are missing or incomplete. Please check your details and try again.
+[{senang code}]",Ask the customer to complete missing fields and follow the required format.,ready,Ok to proceed

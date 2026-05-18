@@ -55,6 +55,23 @@ export function useDeleteKB() {
   })
 }
 
+export function useDeleteManyKB() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: string[]) =>
+      Promise.all(ids.map(id => apiFetch(`/admin/kb/${id}`, { method: 'DELETE' }))),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['kb'] }),
+  })
+}
+
+export function useDeleteAllKB() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: () => apiFetch('/admin/kb/all', { method: 'DELETE' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['kb'] }),
+  })
+}
+
 export function useUploadKB() {
   const qc = useQueryClient()
   return useMutation({

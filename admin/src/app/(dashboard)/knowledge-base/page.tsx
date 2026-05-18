@@ -41,15 +41,16 @@ export default function KnowledgeBasePage() {
 
         <TabsContent value="entries" className="mt-4 space-y-4">
           {showForm && (
-            <div className="border rounded-lg p-4">
-              <h2 className="font-medium mb-3">{editEntry ? 'Edit Entry' : 'New Entry'}</h2>
+            <div className="border rounded-lg p-4 bg-background">
               <KBForm entry={editEntry} onDone={handleDone} />
             </div>
           )}
-          {isLoading ? (
-            <p className="text-muted-foreground text-sm">Loading…</p>
-          ) : (
-            <KBTable entries={entries} onEdit={handleEdit} />
+          {!showForm && (
+            isLoading ? (
+              <p className="text-muted-foreground text-sm">Loading…</p>
+            ) : (
+              <KBTable entries={entries} onEdit={handleEdit} />
+            )
           )}
         </TabsContent>
 
