@@ -131,6 +131,10 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
 
     // If KB has relevant info, send it before handing off
     if (kbChunks.length > 0) {
+      const insurerHint = customer.insurer
+        ? `The customer's insurer is: ${customer.insurer}. If the KB contains a hotline or information specific to ${customer.insurer}, provide ONLY that — do not list hotlines for other insurers. Start by expressing concern for the customer (e.g. "Are you okay?") before giving the hotline.`
+        : `The customer's insurer is unknown. Provide all available insurer hotlines from the KB so they can find theirs. Start by expressing concern for the customer before listing the hotlines.`
+
       const kbReply = await generateReply({
         userMessage: text,
         language,
@@ -143,7 +147,7 @@ export async function handleIncomingMessage(phone: string, text: string, pushNam
           persona_name: botConfig.persona_name ?? 'Aina',
           language_fallback: botConfig.language_fallback ?? 'bm',
           custom_instructions: (botConfig.custom_instructions ?? '') +
-            '\n\nIMPORTANT: After providing the helpful information above, end with a brief note that a human agent will follow up shortly.',
+            `\n\n${insurerHint}\n\nAfter providing the information, end with a brief note that a human agent will follow up shortly.`,
         },
         useGpt4: true,
       })

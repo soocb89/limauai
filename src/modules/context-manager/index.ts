@@ -60,15 +60,15 @@ export async function saveMessage(params: {
   return rows[0]
 }
 
-export async function getOrCreateCustomer(phone: string): Promise<{ id: string; language: string | null; name: string | null }> {
+export async function getOrCreateCustomer(phone: string): Promise<{ id: string; language: string | null; name: string | null; insurer: string | null }> {
   const { rows } = await db.query(
-    `SELECT id, language, name FROM customers WHERE phone = $1`,
+    `SELECT id, language, name, insurer FROM customers WHERE phone = $1`,
     [phone]
   )
   if (rows.length > 0) return rows[0]
 
   const { rows: newRows } = await db.query(
-    `INSERT INTO customers (phone, source) VALUES ($1, 'bot_captured') RETURNING id, language, name`,
+    `INSERT INTO customers (phone, source) VALUES ($1, 'bot_captured') RETURNING id, language, name, insurer`,
     [phone]
   )
   return newRows[0]
